@@ -46,7 +46,16 @@ function render() {
           <button class="detail-link" data-detail="${esc(item.id)}">Lihat detail ↗</button></div>
       </div>
     </article>`).join('');
-  $('#emptyState').classList.toggle('hidden', list.length > 0);
+  $('#emptyState').classList.toggle('hidden', list.length > 0 || (backend?.ready && !catalogLoaded));
+  const totalVisible = packages.filter(item => item.visible !== false).length;
+  $('#resultCount').textContent = `Menampilkan ${list.length} dari ${totalVisible} paket`;
+  $('#clearFilters').classList.toggle('hidden', !query && category === 'Semua');
+  document.querySelectorAll('[data-destination]').forEach(button => {
+    const selected = query === button.dataset.destination.toLocaleLowerCase('id');
+    button.classList.toggle('is-selected', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  });
+  observeReveals($('#packageGrid'));
 }
 
 function detail(id) {
@@ -138,6 +147,84 @@ $('#detailContent').addEventListener('click', event => {
 $('#searchInput').addEventListener('input', render);
 $('#categoryFilter').addEventListener('change', render);
 $('#retryCatalog').addEventListener('click', () => loadCatalog());
+function clearFilters() {
+  $('#searchInput').value = '';
+  $('#categoryFilter').value = 'Semua';
+  render();
+}
+$('#clearFilters').addEventListener('click', clearFilters);
+$('#emptyReset').addEventListener('click', clearFilters);
+document.querySelector('.popular-destinations').addEventListener('click', event => {
+  const button = event.target.closest('[data-destination]');
+  if (!button) return;
+  $('#searchInput').value = button.dataset.destination;
+  $('#categoryFilter').value = 'Semua';
+  render();
+  $('#paket').scrollIntoView({ behavior: 'smooth' });
+});
+
+const menuToggle = $('#menuToggle');
+const mainNav = $('#mainNav');
+function closeMenu() {
+  mainNav.classList.remove('is-open');
+  menuToggle.setAttribute('aria-expanded', 'false');
+  menuToggle.setAttribute('aria-label', 'Buka menu');
+}
+menuToggle.addEventListener('click', () => {
+  const open = menuToggle.getAttribute('aria-expanded') !== 'true';
+  menuToggle.setAttribute('aria-expanded', String(open));
+  menuToggle.setAttribute('aria-label', open ? 'Tutup menu' : 'Buka menu');
+  mainNav.classList.toggle('is-open', open);
+});
+mainNav.addEventListener('click', event => { if (event.target.closest('a')) closeMenu(); });
+document.addEventListener('keydown', event => { if (event.key === 'Escape') closeMenu(); });
+document.addEventListener('click', event => {
+  if (mainNav.classList.contains('is-open') && !event.target.closest('.topbar')) closeMenu();
+});
+
+const revealObserver = 'IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ? new IntersectionObserver(entries => entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('is-visible');
+      revealObserver.unobserve(entry.target);
+    }
+  }), { threshold: 0.12, rootMargin: '0px 0px -24px 0px' }) : null;
+function observeReveals(root = document) {
+  if (!revealObserver) return;
+  root.querySelectorAll('.section, .card, .service-grid article, .why-list article, .contact-card').forEach(element => {
+    if (!element.classList.contains('reveal-on-scroll')) {
+      element.classList.add('reveal-on-scroll');
+      revealObserver.observe(element);
+    }
+  });
+}
+observeReveals();
+
+const sectionObserver = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting || !entry.target.id) return;
+    $$('.nav-link').forEach(link => {
+      if (link.hash === `#${entry.target.id}`) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  });
+}, { threshold: 0, rootMargin: '-22% 0px -68% 0px' }) : null;
+if (sectionObserver) ['paket', 'layanan', 'tentang'].forEach(id => sectionObserver.observe(document.getElementById(id)));
+
+const scrollProgress = $('#scrollProgress');
+const backToTop = $('#backToTop');
+let scrollFrame = 0;
+window.addEventListener('scroll', () => {
+  if (scrollFrame) return;
+  scrollFrame = requestAnimationFrame(() => {
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    scrollProgress.style.transform = `scaleX(${maxScroll > 0 ? window.scrollY / maxScroll : 0})`;
+    backToTop.classList.toggle('is-visible', window.scrollY > 500);
+    scrollFrame = 0;
+  });
+}, { passive: true });
+backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
 $('#year').textContent = new Date().getFullYear();
 $$('.wa-link').forEach(link => { link.href = waLink('Halo Nusantara Journey, saya ingin bertanya tentang layanan dan paket perjalanan.'); link.target = '_blank'; link.rel = 'noopener'; });
 window.addEventListener('focus', refreshWhenReturning);

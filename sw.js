@@ -1,4 +1,4 @@
-const CACHE='nusantara-journey-v8';
+const CACHE='nusantara-journey-v9';
 const CORE=[
   './','./index.html','./admin.html','./offline.html','./styles.css','./app.js','./admin.js','./theme.js','./manifest.webmanifest','./icon.svg',
   './supabase-config.js','./supabase-browser.js',
