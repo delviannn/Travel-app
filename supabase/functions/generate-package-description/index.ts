@@ -35,7 +35,7 @@ Deno.serve(async (request: Request) => {
     return respond({ error: 'Nama, destinasi, dan kategori paket wajib diisi.' }, 400);
   }
 
-  const model = Deno.env.get('GEMINI_MODEL') || 'gemini-3.8-flash';
+  const model = Deno.env.get('GEMINI_MODEL') || 'gemini-3.5-flash-lite';
   let aiResponse: Response;
   try {
     aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {

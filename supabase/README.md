@@ -22,12 +22,12 @@ The committed values are placeholders, so the site continues to show its local d
 
 ## 3. Enable AI descriptions
 
-The AI description button calls the `generate-package-description` Edge Function. Add the Gemini API key as a server-side Edge Function secret named `GEMINI_API_KEY` in the Supabase Dashboard. Optionally set `GEMINI_MODEL` to a model enabled for the key; the function defaults to `gemini-3.8-flash`.
+The AI description button calls the `generate-package-description` Edge Function. Add the Gemini API key as a server-side Edge Function secret named `GEMINI_API_KEY` in the Supabase Dashboard. The function defaults to `gemini-3.5-flash-lite`; optionally set `GEMINI_MODEL` to another model enabled for the key.
 
 ```sh
 supabase login
 supabase link --project-ref YOUR_PROJECT_REF
-supabase secrets set GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+supabase secrets set GEMINI_API_KEY=YOUR_GEMINI_API_KEY GEMINI_MODEL=gemini-3.5-flash-lite
 supabase functions deploy generate-package-description
 ```
 
