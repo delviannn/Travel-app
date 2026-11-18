@@ -7,13 +7,13 @@
   <meta name="robots" content="noindex,nofollow">
   <title>Admin Paket Wisata — Nusantara Journey</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="manifest.webmanifest"><script>try{document.documentElement.dataset.theme=localStorage.getItem("nj-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch{}</script>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="admin-page">
   <header class="topbar admin-topbar">
     <a class="brand" href="./index.html"><span class="brand-mark">N<span>J</span></span><span class="brand-name">Nusantara <b>Journey</b><small>TOUR & TRAVEL</small></span></a>
-    <a class="button navy admin-back-link" href="./index.html#paket">← Kembali ke katalog</a>
+    <div class="admin-topbar-actions"><button class="theme-toggle" type="button" aria-label="Aktifkan mode gelap" aria-pressed="false">◐ <span>Mode gelap</span></button><a class="button navy admin-back-link" href="./index.html#paket">← Kembali ke katalog</a></div>
   </header>
   <main class="admin-main">
     <section id="loginPanel" class="admin-panel admin-login">
@@ -67,7 +67,7 @@
     </section>
   </main>
   <footer class="admin-footer"><span>Dashboard pengelolaan Nusantara Journey Tour & Travel</span><a href="./index.html#paket">Kembali ke katalog →</a></footer>
-  <script src="supabase-config.js"></script>
+  <script src="theme.js"></script><script src="supabase-config.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-browser.js"></script>
   <script src="admin.js"></script>

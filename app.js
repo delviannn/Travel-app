@@ -21,8 +21,11 @@ const startingPackages = [
   { id: 'japan', name: 'Japan Seasonal Journey', destination: 'Jepang', category: 'Internasional', duration: '7 hari 6 malam · estimasi', price: 24800000, description: 'Inspirasi perjalanan untuk menikmati kota dan budaya Jepang. Musim, tanggal keberangkatan, tiket, dan fasilitas sangat memengaruhi harga.', itinerary: ['Hari 1 — Keberangkatan (rencana)', 'Hari 2–6 — Rute Jepang dibahas sesuai musim (rencana)', 'Hari 7 — Persiapan kembali (rencana)'], included: ['Akomodasi (rencana)', 'Transportasi lokal (rencana)'], excluded: ['Visa dan asuransi perjalanan', 'Pengeluaran pribadi'], image: './assets/japan.jpg', visible: true }
 ];
 
-let packages = backend?.ready ? [] : (JSON.parse(localStorage.getItem('nj-packages') || 'null') || startingPackages);
-let catalogLoaded = false;
+function readStoredPackages(key) {
+  try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch { return null; }
+}
+let packages = backend?.ready ? (readStoredPackages('nj-public-packages') || []) : (readStoredPackages('nj-packages') || startingPackages);
+let catalogLoaded = packages.length > 0;
 let catalogRequest = null;
 let catalogRefreshPending = false;
 let lastCatalogRefresh = 0;
@@ -36,7 +39,7 @@ function render() {
 
   $('#packageGrid').innerHTML = list.map(item => `
     <article class="card">
-      <div class="card-image"><img src="${esc(item.image || startingPackages[0].image)}" alt="Pemandangan destinasi ${esc(item.destination)}" loading="lazy"><span class="card-category">${esc(item.category.toUpperCase())}</span></div>
+      <div class="card-image"><img src="${esc(item.image || startingPackages[0].image)}" data-fallback="${esc(item.imageFallback || item.image || startingPackages[0].image)}" alt="Pemandangan destinasi ${esc(item.destination)}" loading="lazy"><span class="card-category">${esc(item.category.toUpperCase())}</span></div>
       <div class="card-body"><div class="card-meta"><span>⌖ ${esc(item.destination)}</span><span>◷ ${esc(item.duration || 'Durasi belum dikonfirmasi')}</span></div>
         <h3>${esc(item.name)}</h3><p>${esc(item.description)}</p>
         <div class="card-bottom"><div><div class="price-label">HARGA ESTIMASI · PER ORANG</div><div class="price">${item.price ? `Mulai Rp ${money(item.price)}` : 'Hubungi kami'}</div></div>
@@ -55,7 +58,7 @@ function detail(id) {
   }
   const message = `Halo Nusantara Journey, saya ingin bertanya tentang paket ${item.name} (${item.destination}). Mohon info jadwal, harga terbaru, dan fasilitasnya.`;
   $('#detailContent').innerHTML = `
-    <img class="detail-img" src="${esc(item.image || startingPackages[0].image)}" alt="${esc(item.destination)}">
+    <img class="detail-img" src="${esc(item.image || startingPackages[0].image)}" data-fallback="${esc(item.imageFallback || item.image || startingPackages[0].image)}" alt="${esc(item.destination)}">
     <div class="eyebrow dark">${esc(item.category.toUpperCase())} · ${esc(item.destination)}</div><h2>${esc(item.name)}</h2>
     <div class="detail-meta">⌖ ${esc(item.destination)} &nbsp; · &nbsp; ◷ ${esc(item.duration || 'Durasi belum dikonfirmasi')}</div>
     <p class="muted">${esc(item.description)}</p><div class="detail-columns">
@@ -87,6 +90,7 @@ async function loadCatalog({ quiet = false } = {}) {
     try {
       packages = await backend.loadPackages();
       catalogLoaded = true;
+      try { localStorage.setItem('nj-public-packages', JSON.stringify(packages)); } catch { /* Storage may be unavailable in private browsing. */ }
       $('#catalogStatus').textContent = 'Harga paket adalah estimasi. Tanyakan ketersediaan dan detail terbaru kepada tim.';
       render();
     } catch (error) {
@@ -119,6 +123,14 @@ $('#packageGrid').addEventListener('click', event => {
   const button = event.target.closest('[data-detail]');
   if (button) detail(button.dataset.detail);
 });
+function useFallbackImage(event) {
+  const image = event.target.closest('img[data-fallback]');
+  if (!image || image.dataset.fallbackUsed) return;
+  image.dataset.fallbackUsed = 'true';
+  image.src = image.dataset.fallback;
+}
+$('#packageGrid').addEventListener('error', useFallbackImage, true);
+$('#detailContent').addEventListener('error', useFallbackImage, true);
 $('#detailContent').addEventListener('click', event => {
   const closeLink = event.target.closest('[data-close="detailDialog"]');
   if (closeLink) { event.preventDefault(); $('#detailDialog').close(); document.querySelector('#paket').scrollIntoView(); }
@@ -134,6 +146,39 @@ document.addEventListener('visibilitychange', refreshWhenReturning);
 window.addEventListener('storage', event => {
   if (event.key === 'nj-package-catalog-updated') loadCatalog({ quiet: true });
 });
+
+let installPrompt = null;
+const installButton = $('#installApp');
+const installMessage = $('#installMessage');
+function showInstallMessage(message) {
+  installMessage.textContent = message;
+  installMessage.classList.remove('hidden');
+  window.clearTimeout(showInstallMessage.timer);
+  showInstallMessage.timer = window.setTimeout(() => installMessage.classList.add('hidden'), 7000);
+}
+window.addEventListener('beforeinstallprompt', event => {
+  event.preventDefault();
+  installPrompt = event;
+});
+installButton.addEventListener('click', async () => {
+  if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
+    showInstallMessage('Nusantara Journey sudah terpasang di perangkat ini.');
+    return;
+  }
+  if (!installPrompt) {
+    showInstallMessage('Pilih menu browser: “Install app” di Android/Edge, atau Bagikan → Tambahkan ke Layar Utama di iPhone.');
+    return;
+  }
+  installPrompt.prompt();
+  const choice = await installPrompt.userChoice;
+  showInstallMessage(choice.outcome === 'accepted' ? 'Nusantara Journey sedang dipasang.' : 'Pemasangan dibatalkan. Kamu bisa mencobanya lagi kapan saja.');
+  installPrompt = null;
+});
+window.addEventListener('appinstalled', () => {
+  installPrompt = null;
+  showInstallMessage('Nusantara Journey berhasil dipasang.');
+});
+
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
 
 render();

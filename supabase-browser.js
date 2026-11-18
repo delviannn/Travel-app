@@ -23,7 +23,8 @@
       id: row.id, name: row.name, destination: row.destination, category: row.category,
       duration: row.duration, price: row.price_start, description: row.description,
       itinerary: row.itinerary || [], included: row.inclusions || [], excluded: row.exclusions || [],
-      image, imagePath: row.cover_photo_path, imageAlt: row.cover_photo_alt, visible: row.visible
+      image, imageFallback: fallbackImages[row.slug] || './assets/batam-bintan.jpg',
+      imagePath: row.cover_photo_path, imageAlt: row.cover_photo_alt, visible: row.visible
     };
   }
 

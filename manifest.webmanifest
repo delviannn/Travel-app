@@ -1,1 +1,21 @@
-{"name":"Nusantara Journey Tour & Travel","short_name":"Nusantara Journey","start_url":"./","display":"standalone","background_color":"#fbfaf7","theme_color":"#122b4e","description":"Katalog paket perjalanan Nusantara Journey.","icons":[{"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]}
+{
+  "id": "./",
+  "name": "Nusantara Journey Tour & Travel",
+  "short_name": "Nusantara Journey",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#fbfaf7",
+  "theme_color": "#122b4e",
+  "description": "Katalog paket perjalanan Nusantara Journey.",
+  "categories": ["travel", "shopping"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Lihat katalog", "short_name": "Katalog", "url": "./index.html#paket" },
+    { "name": "Dashboard admin", "short_name": "Admin", "url": "./admin.html" }
+  ]
+}

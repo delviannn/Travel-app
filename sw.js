@@ -1,6 +1,6 @@
-const CACHE='nusantara-journey-v7';
+const CACHE='nusantara-journey-v8';
 const CORE=[
-  './','./index.html','./admin.html','./styles.css','./app.js','./admin.js','./manifest.webmanifest','./icon.svg',
+  './','./index.html','./admin.html','./offline.html','./styles.css','./app.js','./admin.js','./theme.js','./manifest.webmanifest','./icon.svg',
   './supabase-config.js','./supabase-browser.js',
   './assets/batam-bintan.jpg','./assets/batam-city.jpg','./assets/bali.jpg',
   './assets/labuan-bajo.jpg','./assets/singapore.jpg','./assets/japan.jpg'
@@ -29,7 +29,7 @@ self.addEventListener('fetch',event=>{
         const response=await fetch(new Request(request,{cache:'reload'}));
         if(response.ok)await cache.put(request,response.clone());
         return response;
-      }catch{return await cache.match(request)||await cache.match('./index.html')}
+      }catch{return await cache.match(request)||await cache.match('./offline.html')||await cache.match('./index.html')}
     }
     const cached=await cache.match(request);
     if(cached)return cached;
