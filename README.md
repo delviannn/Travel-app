@@ -17,4 +17,4 @@ Buka `index.html` langsung untuk melihat katalog. Untuk mencoba PWA dan service 
 
 ## Sebelum rilis
 
-Sebelum backend aktif, isi `supabase-config.js` dengan Project URL dan publishable/anon key. Buat akun admin di Supabase Auth, daftarkan di `admin_profiles`, lalu tambahkan OpenAI API key sebagai Supabase secret untuk fitur AI. Harga/itinerary masih estimasi dan materi usaha perlu disetujui pemilik. Nomor WhatsApp mengikuti nomor yang diberikan pengguna: `0821 2920 7154`.
+Sebelum backend aktif, isi `.env.local` sebagai catatan lokal, lalu salin Project URL dan publishable/anon key ke `supabase-config.js` untuk situs HTML statis. Buat akun admin di Supabase Auth, daftarkan di `admin_profiles`, lalu tambahkan OpenAI API key sebagai Supabase secret untuk fitur AI. Harga/itinerary masih estimasi dan materi usaha perlu disetujui pemilik. Nomor WhatsApp mengikuti nomor yang diberikan pengguna: `0821 2920 7154`.

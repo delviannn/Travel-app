@@ -1,6 +1,5 @@
-// Set these values from Supabase Project Settings > API.
-// The publishable/anon key is intended for the browser; never put service_role here.
+// Publishable key is browser-safe; database access is protected by RLS.
 window.NJ_SUPABASE_CONFIG = {
-  url: 'https://YOUR_PROJECT_REF.supabase.co',
-  anonKey: 'YOUR_SUPABASE_PUBLISHABLE_OR_ANON_KEY'
+  url: 'https://sctxitibwdqxiypcgtcs.supabase.co',
+  anonKey: 'sb_publishable_-rJ8hgUkFin0j65-zJopvQ_HluJD3E3'
 };
