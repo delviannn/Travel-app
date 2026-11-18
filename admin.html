@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#122b4e">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Admin Paket Wisata — Nusantara Journey</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="admin-page">
+  <header class="topbar admin-topbar">
+    <a class="brand" href="./index.html"><span class="brand-mark">N<span>J</span></span><span class="brand-name">Nusantara <b>Journey</b><small>TOUR & TRAVEL</small></span></a>
+    <a class="button navy admin-back-link" href="./index.html#paket">← Kembali ke katalog</a>
+  </header>
+  <main class="admin-main">
+    <section id="loginPanel" class="admin-panel admin-login">
+      <div class="eyebrow dark">AREA PEMILIK USAHA</div>
+      <h1>Masuk admin</h1>
+      <p id="loginHelp" class="admin-description">Masuk menggunakan akun admin Nusantara Journey.</p>
+      <form id="loginForm" class="admin-form">
+        <label>Email<input type="email" id="loginEmail" required autocomplete="username" placeholder="Email admin"></label>
+        <label>Kata sandi<input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Kata sandi"></label>
+        <button class="button navy" type="submit">Masuk ke dashboard <span>→</span></button>
+      </form>
+      <p id="loginError" class="error" role="alert"></p>
+      <p class="admin-hint"><a href="./index.html#paket">Lihat katalog publik</a></p>
+    </section>
+
+    <section id="dashboardPanel" class="admin-dashboard hidden">
+      <div class="admin-page-heading">
+        <div><div class="eyebrow dark">DASHBOARD NUSANTARA JOURNEY</div><h1>Kelola paket wisata</h1><p id="adminWelcome" class="admin-description">Atur katalog yang tampil kepada pengunjung.</p></div>
+        <button id="logout" class="outline-button" type="button">Keluar</button>
+      </div>
+      <p id="adminNotice" class="admin-notice" role="status" aria-live="polite"></p>
+      <div class="admin-workspace">
+        <section class="admin-panel package-editor">
+          <div class="admin-panel-heading"><div><div class="eyebrow dark">KATALOG</div><h2 id="formHeading">Tambah paket</h2></div><button id="cancelEdit" class="text-button hidden" type="button">Batalkan edit</button></div>
+          <form id="packageForm" class="admin-form">
+            <input type="hidden" id="editId">
+            <label>Nama paket<input id="pName" required maxlength="120" placeholder="Contoh: Batam City Discovery"></label>
+            <div class="row"><label>Destinasi<input id="pDestination" required maxlength="160" placeholder="Contoh: Batam"></label><label>Kategori<select id="pCategory"><option>Domestik</option><option>Internasional</option></select></label></div>
+            <div class="row"><label>Durasi<input id="pDuration" maxlength="80" placeholder="Contoh: 3 hari 2 malam"></label><label>Harga mulai (Rp)<input id="pPrice" type="number" min="0" step="1000" placeholder="Kosong = hubungi kami"></label></div>
+            <label>Deskripsi<textarea id="pDescription" rows="4" required maxlength="2000" placeholder="Ceritakan pengalaman perjalanan..."></textarea></label>
+            <button type="button" id="generateDescription" class="outline-button">✦ Buat draf deskripsi dengan AI</button>
+            <p id="packageMessage" class="inline-message" role="status" aria-live="polite"></p>
+            <label>Itinerary<textarea id="pItinerary" rows="4" placeholder="Satu baris untuk setiap hari"></textarea></label>
+            <div class="row"><label>Termasuk<textarea id="pIncluded" rows="3" placeholder="Satu fasilitas per baris"></textarea></label><label>Tidak termasuk<textarea id="pExcluded" rows="3" placeholder="Satu fasilitas per baris"></textarea></label></div>
+            <label>Foto paket <span class="field-note">JPG, PNG, WebP · maksimal 5 MB</span><input id="pImage" type="file" accept="image/jpeg,image/png,image/webp"></label>
+            <button class="button navy" type="submit">Simpan paket</button>
+          </form>
+        </section>
+        <section class="admin-panel package-list-panel">
+          <div class="admin-panel-heading"><div><div class="eyebrow dark">DAFTAR PAKET</div><h2>Paket tersimpan</h2></div><button id="reloadPackages" class="text-button" type="button">Muat ulang</button></div>
+          <p id="packageListHelp" class="admin-description">Paket di sini mencakup yang tampil maupun disembunyikan.</p>
+          <div id="adminList" class="admin-list"></div>
+          <details class="password-settings"><summary>Ganti kata sandi</summary>
+            <label>Kata sandi saat ini<input id="oldPass" type="password" autocomplete="current-password"></label>
+            <label>Kata sandi baru<input id="newPass" type="password" autocomplete="new-password"></label>
+            <label>Ulangi kata sandi baru<input id="confirmPass" type="password" autocomplete="new-password"></label>
+            <button id="changePass" class="outline-button" type="button">Simpan kata sandi</button><p id="passMessage" class="inline-message" role="status"></p>
+          </details>
+        </section>
+      </div>
+    </section>
+  </main>
+  <footer class="admin-footer"><span>Dashboard pengelolaan Nusantara Journey Tour & Travel</span><a href="./index.html#paket">Kembali ke katalog →</a></footer>
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-browser.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

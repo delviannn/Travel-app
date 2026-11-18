@@ -57,7 +57,7 @@
       cover_photo_alt: item.imageAlt || `Pemandangan ${item.destination}`,
       visible: item.visible, updated_at: new Date().toISOString()
     };
-    const { error } = await client.from('tour_packages').upsert(row).select().single();
+    const { data: savedRow, error } = await client.from('tour_packages').upsert(row).select().single();
     if (error) {
       if (file && photoPath) await client.storage.from(bucket).remove([photoPath]);
       throw error;
@@ -66,6 +66,7 @@
       const { error: oldPhotoError } = await client.storage.from(bucket).remove([oldItem.imagePath]);
       if (oldPhotoError) console.warn('Foto baru tersimpan, tetapi foto lama perlu dibersihkan dari Storage.', oldPhotoError);
     }
+    return mapPackage(savedRow);
   }
 
   async function removePackage(item) {
@@ -85,13 +86,27 @@
   async function signIn(email, password) {
     const { data, error } = await client.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    const { data: profile, error: profileError } = await client.from('admin_profiles')
-      .select('id,is_active').eq('id', data.user.id).maybeSingle();
-    if (profileError || !profile?.is_active) {
+    try {
+      await requireAdmin(data.user);
+    } catch (error) {
       await client.auth.signOut();
-      throw new Error('Akun ini belum diberi akses admin. Minta pemilik proyek mengaktifkannya.');
+      throw error;
     }
     return data.user;
+  }
+
+  async function requireAdmin(user) {
+    const { data: profile, error } = await client.from('admin_profiles')
+      .select('id,is_active').eq('id', user.id).maybeSingle();
+    if (error) throw error;
+    if (!profile?.is_active) throw new Error('Akun ini belum diberi akses admin. Minta pemilik proyek mengaktifkannya.');
+    return user;
+  }
+
+  async function currentAdmin() {
+    const { data, error } = await client.auth.getUser();
+    if (error) throw error;
+    return data.user ? requireAdmin(data.user) : null;
   }
 
   async function signOut() {
@@ -125,6 +140,6 @@
 
   window.njBackend = {
     ready, client, loadPackages, savePackage, removePackage, setVisible,
-    signIn, signOut, changePassword, generateDescription
+    signIn, currentAdmin, signOut, changePassword, generateDescription
   };
 })();
