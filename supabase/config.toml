@@ -1,0 +1,2 @@
+[functions.generate-package-description]
+verify_jwt = true

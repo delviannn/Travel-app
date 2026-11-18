@@ -28,7 +28,7 @@ jobs:
       - name: Prepare site artifact
         run: |
           mkdir -p _site/assets
-          cp index.html app.js styles.css manifest.webmanifest sw.js icon.svg _site/
+          cp index.html app.js styles.css manifest.webmanifest sw.js icon.svg supabase-config.js supabase-browser.js _site/
           cp assets/* _site/assets/
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4
