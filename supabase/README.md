@@ -37,6 +37,8 @@ Do not commit a real key. `.env.example` lists the values to prepare; `.gitignor
 
 Sign in through the site's Admin button using the account created in Supabase Auth. Add or edit catalog items there; package photos are limited to JPG, PNG, or WebP and 5 MB. The example prices and itineraries in the starter site are estimates and should be reviewed before they become official offers.
 
+To show the optional starter catalog, run [`seed-estimate-packages.sql`](seed-estimate-packages.sql) in the Supabase SQL Editor. It inserts example prices and itineraries marked as estimates; re-running it does not duplicate those packages.
+
 ## Notes
 
 - `schema.sql` can be reapplied safely for policies and table setup; it does not create demo admin users.

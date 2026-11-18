@@ -4,13 +4,21 @@
     !config.url.includes('YOUR_PROJECT_REF') && config.anonKey && !config.anonKey.includes('YOUR_SUPABASE'));
   const client = ready ? window.supabase.createClient(config.url, config.anonKey) : null;
   const bucket = 'package-photos';
+  const fallbackImages = {
+    'batam-bintan-escape': './assets/batam-bintan.jpg',
+    'batam-city-discovery': './assets/batam-city.jpg',
+    'bali-lombok-highlights': './assets/bali.jpg',
+    'labuan-bajo-getaway': './assets/labuan-bajo.jpg',
+    'singapore-city-break': './assets/singapore.jpg',
+    'japan-seasonal-journey': './assets/japan.jpg'
+  };
   const slugify = value => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || crypto.randomUUID();
 
   function mapPackage(row) {
     const image = row.cover_photo_path
       ? client.storage.from(bucket).getPublicUrl(row.cover_photo_path).data.publicUrl
-      : './assets/batam-bintan.jpg';
+      : fallbackImages[row.slug] || './assets/batam-bintan.jpg';
     return {
       id: row.id, name: row.name, destination: row.destination, category: row.category,
       duration: row.duration, price: row.price_start, description: row.description,
