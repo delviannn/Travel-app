@@ -22,12 +22,12 @@ The committed values are placeholders, so the site continues to show its local d
 
 ## 3. Enable AI descriptions
 
-The AI description button calls the `generate-package-description` Edge Function. The OpenAI API key stays as a server secret:
+The AI description button calls the `generate-package-description` Edge Function. Add the Gemini API key as a server-side Edge Function secret named `GEMINI_API_KEY` in the Supabase Dashboard. Optionally set `GEMINI_MODEL` to a model enabled for the key; the function defaults to `gemini-3.8-flash`.
 
 ```sh
 supabase login
 supabase link --project-ref YOUR_PROJECT_REF
-supabase secrets set OPENAI_API_KEY=YOUR_OPENAI_API_KEY OPENAI_MODEL=gpt-4.1-mini
+supabase secrets set GEMINI_API_KEY=YOUR_GEMINI_API_KEY
 supabase functions deploy generate-package-description
 ```
 

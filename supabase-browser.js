@@ -108,7 +108,17 @@
 
   async function generateDescription(details) {
     const { data, error } = await client.functions.invoke('generate-package-description', { body: details });
-    if (error) throw error;
+    if (error) {
+      let message = error.message || 'AI gagal membuat deskripsi.';
+      try {
+        const response = error.context;
+        if (response && typeof response.json === 'function') {
+          const body = await response.json();
+          if (typeof body?.error === 'string') message = body.error;
+        }
+      } catch { /* Keep the SDK error when the response has no JSON body. */ }
+      throw new Error(message);
+    }
     if (!data?.description) throw new Error('AI belum mengembalikan deskripsi.');
     return data.description;
   }

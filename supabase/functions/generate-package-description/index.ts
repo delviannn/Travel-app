@@ -15,8 +15,8 @@ Deno.serve(async (request: Request) => {
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const anonKey = Deno.env.get('SUPABASE_ANON_KEY');
-  const openAiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!supabaseUrl || !anonKey || !openAiKey) return respond({ error: 'Fungsi AI belum dikonfigurasi.' }, 503);
+  const geminiKey = Deno.env.get('GEMINI_API_KEY');
+  if (!supabaseUrl || !anonKey || !geminiKey) return respond({ error: 'Fungsi AI belum dikonfigurasi.' }, 503);
 
   const supabase = createClient(supabaseUrl, anonKey, { global: { headers: { Authorization: authorization } } });
   const { data: userData, error: authError } = await supabase.auth.getUser();
@@ -35,22 +35,36 @@ Deno.serve(async (request: Request) => {
     return respond({ error: 'Nama, destinasi, dan kategori paket wajib diisi.' }, 400);
   }
 
-  const model = Deno.env.get('OPENAI_MODEL') || 'gpt-4.1-mini';
-  const aiResponse = await fetch('https://api.openai.com/v1/responses', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${openAiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model,
-      instructions: 'Tulis deskripsi singkat paket tur berbahasa Indonesia, hangat dan tepercaya, maksimal 70 kata. Gunakan hanya informasi yang diberikan. Jangan mengarang harga, fasilitas, jadwal, klaim keselamatan, atau detail destinasi. Jika data belum lengkap, arahkan pembaca untuk mengonfirmasi kepada Nusantara Journey.',
-      input: JSON.stringify({ name, destination, category, duration, itinerary }),
-      max_output_tokens: 180,
-    }),
-  });
-  if (!aiResponse.ok) return respond({ error: 'Layanan AI gagal membuat deskripsi. Coba lagi nanti.' }, 502);
+  const model = Deno.env.get('GEMINI_MODEL') || 'gemini-3.8-flash';
+  let aiResponse: Response;
+  try {
+    aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+      method: 'POST',
+      headers: { 'x-goog-api-key': geminiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: 'Tulis deskripsi singkat paket tur berbahasa Indonesia, hangat dan tepercaya, maksimal 70 kata. Gunakan hanya informasi yang diberikan. Jangan mengarang harga, fasilitas, jadwal, klaim keselamatan, atau detail destinasi. Jika data belum lengkap, arahkan pembaca untuk mengonfirmasi kepada Nusantara Journey.' }] },
+        contents: [{ parts: [{ text: JSON.stringify({ name, destination, category, duration, itinerary }) }] }],
+        generationConfig: { maxOutputTokens: 180 },
+      }),
+    });
+  } catch {
+    return respond({ error: 'Tidak dapat terhubung ke layanan Gemini. Coba lagi sebentar.' }, 502);
+  }
+  if (!aiResponse.ok) {
+    if (aiResponse.status === 400 || aiResponse.status === 404) {
+      return respond({ error: `Model Gemini "${model}" tidak tersedia atau permintaannya ditolak. Periksa secret GEMINI_MODEL di Supabase.` }, 502);
+    }
+    if (aiResponse.status === 401 || aiResponse.status === 403) {
+      return respond({ error: 'Key Gemini tidak valid atau belum memiliki akses. Periksa GEMINI_API_KEY di Supabase.' }, 502);
+    }
+    if (aiResponse.status === 429) {
+      return respond({ error: 'Kuota Gemini sedang habis atau mencapai batas. Periksa kuota dan penagihan di Google AI Studio.' }, 502);
+    }
+    return respond({ error: 'Layanan Gemini sedang bermasalah. Coba lagi nanti.' }, 502);
+  }
   const result = await aiResponse.json();
-  const description = (result.output || []).flatMap((item: { type?: string; content?: Array<{ type?: string; text?: string }> }) =>
-    item.type === 'message' ? item.content || [] : []).filter((part: { type?: string }) => part.type === 'output_text')
-    .map((part: { text?: string }) => part.text || '').join('').trim();
+  const description = (result.candidates || []).flatMap((candidate: { content?: { parts?: Array<{ text?: string }> } }) =>
+    candidate.content?.parts || []).map((part: { text?: string }) => part.text || '').join('').trim();
   if (!description) return respond({ error: 'AI tidak menghasilkan deskripsi.' }, 502);
   return respond({ description });
 });
