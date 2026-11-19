@@ -12,7 +12,7 @@ insert into public.admin_profiles (id, display_name)
 values ('00000000-0000-0000-0000-000000000000', 'Admin Nusantara Journey');
 ```
 
-Only users with an active `admin_profiles` row can modify catalog data or upload photos, and can manage customer reviews. Public visitors can only read visible packages and reviews. Reapply `schema.sql` after review moderation is added so the `customer_reviews` table and access policies are created.
+Only users with an active `admin_profiles` row can modify catalog data or upload photos, and can manage customer reviews. Public visitors can only read visible packages and reviews. Reapply `schema.sql` after review moderation is added so the `customer_reviews` table and access policies are created. To enable per-package videos on an existing project, run [`add-package-videos.sql`](add-package-videos.sql); it adds an optional URL column and keeps existing data.
 
 ## 2. Configure the website
 

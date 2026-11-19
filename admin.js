@@ -93,6 +93,7 @@
     $('#pDestination').value = item.destination || '';
     $('#pCategory').value = item.category || 'Domestik';
     $('#pPrice').value = item.price || '';
+    $('#pVideoUrl').value = item.videoUrl || '';
     $('#pDuration').value = item.duration || '';
     $('#pDescription').value = item.description || '';
     $('#pItinerary').value = (item.itinerary || []).join('\n');
@@ -136,6 +137,7 @@
       destination: $('#pDestination').value.trim(),
       category: $('#pCategory').value,
       price: Number($('#pPrice').value) || null,
+      videoUrl: $('#pVideoUrl').value.trim(),
       duration: $('#pDuration').value.trim() || 'Belum dikonfirmasi',
       description: $('#pDescription').value.trim(),
       itinerary: lines($('#pItinerary').value),
@@ -146,6 +148,15 @@
       imageAlt: oldItem?.imageAlt || '',
       visible: oldItem?.visible !== false
     };
+    if (item.videoUrl) {
+      let video;
+      try { video = new URL(item.videoUrl); } catch { video = null; }
+      const allowedHosts = ['cdn.coverr.co', 'videos.pexels.com', 'cdn.pixabay.com'];
+      if (!video || video.protocol !== 'https:' || !video.pathname.toLowerCase().endsWith('.mp4') || (!allowedHosts.includes(video.hostname) && video.origin !== location.origin)) {
+        $('#packageMessage').textContent = 'Masukkan URL file MP4 langsung dari Coverr, Pexels, Pixabay, atau situs ini.';
+        return;
+      }
+    }
     if (file && file.size > 5 * 1024 * 1024) {
       $('#packageMessage').textContent = 'Ukuran foto maksimal 5 MB.';
       return;

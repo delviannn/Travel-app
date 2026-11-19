@@ -21,7 +21,7 @@
       : fallbackImages[row.slug] || './assets/batam-bintan.jpg';
     return {
       id: row.id, name: row.name, destination: row.destination, category: row.category,
-      duration: row.duration, price: row.price_start, description: row.description,
+      duration: row.duration, price: row.price_start, videoUrl: row.video_url || '', description: row.description,
       itinerary: row.itinerary || [], included: row.inclusions || [], excluded: row.exclusions || [],
       image, imageFallback: fallbackImages[row.slug] || './assets/batam-bintan.jpg',
       imagePath: row.cover_photo_path, imageAlt: row.cover_photo_alt, visible: row.visible
@@ -79,7 +79,7 @@
     const row = {
       ...(oldItem?.id ? { id: item.id } : {}), name: item.name, slug: slugify(item.name),
       destination: item.destination, category: item.category, duration: item.duration,
-      price_start: item.price, description: item.description, itinerary: item.itinerary,
+      price_start: item.price, video_url: item.videoUrl || null, description: item.description, itinerary: item.itinerary,
       inclusions: item.included, exclusions: item.excluded, cover_photo_path: photoPath,
       cover_photo_alt: item.imageAlt || `Pemandangan ${item.destination}`,
       visible: item.visible, updated_at: new Date().toISOString()

@@ -33,6 +33,7 @@ create table if not exists public.tour_packages (
   destination text not null check (length(trim(destination)) > 0),
   category text not null check (category in ('Domestik', 'Internasional')),
   duration text not null default '',
+  video_url text,
   price_start bigint check (price_start is null or price_start >= 0),
   description text not null default '',
   itinerary jsonb not null default '[]'::jsonb check (jsonb_typeof(itinerary) = 'array'),
@@ -45,6 +46,8 @@ create table if not exists public.tour_packages (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.tour_packages add column if not exists video_url text;
 
 create index if not exists tour_packages_visible_order_idx
   on public.tour_packages (visible, sort_order, created_at desc);
