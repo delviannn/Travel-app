@@ -131,6 +131,9 @@ create policy "admins can delete packages" on public.tour_packages
 drop policy if exists "public can read visible customer reviews" on public.customer_reviews;
 create policy "public can read visible customer reviews" on public.customer_reviews
   for select to anon, authenticated using (visible or (select public.is_active_admin()));
+drop policy if exists "public can submit customer reviews" on public.customer_reviews;
+create policy "public can submit customer reviews" on public.customer_reviews
+  for insert to anon, authenticated with check (visible = true);
 drop policy if exists "admins manage customer reviews" on public.customer_reviews;
 create policy "admins manage customer reviews" on public.customer_reviews
   for all to authenticated using ((select public.is_active_admin()))
@@ -162,6 +165,7 @@ create policy "admins manage page sections" on public.page_sections
 
 grant usage on schema public to anon, authenticated;
 grant select on public.tour_packages, public.customer_reviews, public.services, public.site_settings, public.page_sections to anon;
+grant insert on public.customer_reviews to anon;
 grant select, insert, update, delete on public.tour_packages, public.customer_reviews, public.services, public.site_settings, public.page_sections to authenticated;
 grant select, update on public.admin_profiles to authenticated;
 

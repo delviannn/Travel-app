@@ -100,6 +100,18 @@ async function loadCatalog({ quiet = false } = {}) {
   }
 }
 
+$('#reviewForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  const form = event.currentTarget, button = form.querySelector('button[type="submit"]'), message = $('#reviewMessage');
+  if (!backend?.ready) { message.textContent = 'Ulasan belum dapat dikirim. Periksa koneksi, lalu coba lagi.'; return; }
+  button.disabled = true; message.textContent = 'Mengirim ulasan...';
+  try {
+    await backend.saveReview({ author: $('#reviewAuthor').value.trim(), package_name: $('#reviewPackage').value.trim(), rating: Number($('#reviewRating').value), quote: $('#reviewQuote').value.trim() });
+    form.reset(); message.textContent = 'Terima kasih! Ulasanmu sudah tampil di website.'; await loadTestimonials();
+  } catch (error) { message.textContent = error.message || 'Ulasan gagal dikirim. Coba lagi sebentar.'; }
+  finally { button.disabled = false; }
+});
+
 async function loadTestimonials() {
   try { const reviews = await backend.loadReviews(); const box = $('#testimonialList'); if (!reviews.length) return; box.innerHTML = reviews.map(review => `<article class="testimonial-card"><div class="testimonial-stars" aria-label="${review.rating} dari 5 bintang">${'&#9733;'.repeat(review.rating)}${'&#9734;'.repeat(5-review.rating)}</div><blockquote>&ldquo;${esc(review.quote)}&rdquo;</blockquote><p>${esc(review.author)}${review.package_name ? ` &middot; ${esc(review.package_name)}` : ''}</p></article>`).join(''); } catch (error) { console.warn('Ulasan belum dapat dimuat:', error); }
 }

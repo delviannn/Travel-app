@@ -61,14 +61,9 @@
   }
 
   function renderReviews() {
-    $('#reviewAdminList').innerHTML = reviews.map(item => '<article class="admin-list-item review-admin-item"><div class="admin-list-copy"><strong>' + esc(item.author) + ' &middot; ' + '&#9733;'.repeat(item.rating) + '</strong><small>' + esc(item.package_name || 'Tanpa nama paket') + ' &middot; ' + (item.visible ? 'Tampil' : 'Disembunyikan') + '<br>' + esc(item.quote) + '</small></div><div class="admin-actions"><button type="button" data-review-toggle="' + esc(item.id) + '">' + (item.visible ? 'Sembunyikan' : 'Tampilkan') + '</button><button type="button" class="delete" data-review-delete="' + esc(item.id) + '">Hapus</button></div></article>').join('') || '<p class="admin-empty">Belum ada ulasan. Tambahkan ulasan yang sudah disetujui pelanggan.</p>';
+    $('#reviewAdminList').innerHTML = reviews.map(item => '<article class="admin-list-item review-admin-item"><div class="admin-list-copy"><strong>' + esc(item.author) + ' &middot; ' + '&#9733;'.repeat(item.rating) + '</strong><small>' + esc(item.package_name || 'Tanpa nama paket') + ' &middot; ' + (item.visible ? 'Tampil' : 'Disembunyikan') + '<br>' + esc(item.quote) + '</small></div><div class="admin-actions"><button type="button" data-review-toggle="' + esc(item.id) + '">' + (item.visible ? 'Sembunyikan' : 'Tampilkan') + '</button><button type="button" class="delete" data-review-delete="' + esc(item.id) + '">Hapus</button></div></article>').join('') || '<p class="admin-empty">Belum ada ulasan pelanggan.</p>';
   }
 
-  $('#reviewForm').addEventListener('submit', async event => {
-    event.preventDefault(); const message = $('#reviewMessage');
-    try { await backend.saveReview({ author: $('#rAuthor').value.trim(), package_name: $('#rPackage').value.trim(), rating: Number($('#rRating').value), quote: $('#rQuote').value.trim() }); $('#reviewForm').reset(); message.textContent = 'Ulasan tersimpan dan tampil di situs.'; await loadReviews(); }
-    catch (error) { message.textContent = error.message || 'Ulasan gagal disimpan. Pastikan skema Supabase sudah diperbarui.'; }
-  });
   $('#reviewAdminList').addEventListener('click', async event => {
     const button = event.target.closest('[data-review-toggle],[data-review-delete]'); if (!button) return;
     const item = reviews.find(review => review.id === (button.dataset.reviewToggle || button.dataset.reviewDelete)); if (!item) return;
