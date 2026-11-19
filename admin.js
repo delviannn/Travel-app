@@ -9,8 +9,8 @@
   }[char]));
   const money = value => new Intl.NumberFormat('id-ID').format(value);
   let packages = [];
+  let reviews = [];
   let adminEmail = '';
-  let demoPassword = sessionStorage.getItem('nj-demo-password') || 'demo123';
 
   function showMessage(message, kind = '') {
     const node = $('#adminNotice');
@@ -34,8 +34,9 @@
     adminEmail = user?.email || '';
     $('#loginPanel').classList.add('hidden');
     $('#dashboardPanel').classList.remove('hidden');
-    $('#adminWelcome').textContent = adminEmail ? `Masuk sebagai ${adminEmail}. Perubahan katalog langsung tersimpan.` : 'Mode demo lokal. Perubahan hanya tersimpan di browser ini.';
+    $('#adminWelcome').textContent = adminEmail ? `Masuk sebagai ${adminEmail}. Perubahan katalog langsung tersimpan.` : 'Masuk sebagai admin.';
     loadPackages();
+    loadReviews();
   }
 
   async function loadPackages() {
@@ -50,6 +51,33 @@
       showMessage(error.message || 'Paket belum dapat dimuat. Coba muat ulang.', 'error');
     }
   }
+
+  async function loadReviews() {
+    const list = $('#reviewAdminList');
+    if (!backend?.ready) { list.innerHTML = '<p class="admin-empty">Hubungkan Supabase untuk mengelola ulasan bersama.</p>'; return; }
+    list.innerHTML = '<p class="admin-empty">Memuat ulasan...</p>';
+    try { reviews = await backend.loadReviews(true); renderReviews(); }
+    catch (error) { list.innerHTML = '<p class="error">' + esc(error.message || 'Gagal memuat ulasan.') + '</p>'; }
+  }
+
+  function renderReviews() {
+    $('#reviewAdminList').innerHTML = reviews.map(item => '<article class="admin-list-item review-admin-item"><div class="admin-list-copy"><strong>' + esc(item.author) + ' &middot; ' + '&#9733;'.repeat(item.rating) + '</strong><small>' + esc(item.package_name || 'Tanpa nama paket') + ' &middot; ' + (item.visible ? 'Tampil' : 'Disembunyikan') + '<br>' + esc(item.quote) + '</small></div><div class="admin-actions"><button type="button" data-review-toggle="' + esc(item.id) + '">' + (item.visible ? 'Sembunyikan' : 'Tampilkan') + '</button><button type="button" class="delete" data-review-delete="' + esc(item.id) + '">Hapus</button></div></article>').join('') || '<p class="admin-empty">Belum ada ulasan. Tambahkan ulasan yang sudah disetujui pelanggan.</p>';
+  }
+
+  $('#reviewForm').addEventListener('submit', async event => {
+    event.preventDefault(); const message = $('#reviewMessage');
+    try { await backend.saveReview({ author: $('#rAuthor').value.trim(), package_name: $('#rPackage').value.trim(), rating: Number($('#rRating').value), quote: $('#rQuote').value.trim() }); $('#reviewForm').reset(); message.textContent = 'Ulasan tersimpan dan tampil di situs.'; await loadReviews(); }
+    catch (error) { message.textContent = error.message || 'Ulasan gagal disimpan. Pastikan skema Supabase sudah diperbarui.'; }
+  });
+  $('#reviewAdminList').addEventListener('click', async event => {
+    const button = event.target.closest('[data-review-toggle],[data-review-delete]'); if (!button) return;
+    const item = reviews.find(review => review.id === (button.dataset.reviewToggle || button.dataset.reviewDelete)); if (!item) return;
+    button.disabled = true;
+    try { if (button.dataset.reviewToggle) await backend.setReviewVisible(item.id, !item.visible); else if (confirm('Hapus ulasan ini?')) await backend.removeReview(item.id); else return; await loadReviews(); }
+    catch (error) { showMessage(error.message || 'Perubahan ulasan gagal.', 'error'); }
+    finally { button.disabled = false; }
+  });
+  $('#reloadReviews').addEventListener('click', loadReviews);
 
   function resetForm() {
     $('#packageForm').reset();
@@ -89,11 +117,7 @@
     try {
       let user;
       if (backend?.ready) user = await backend.signIn(email, password);
-      else {
-        if (configured) throw new Error('Supabase belum termuat. Periksa koneksi lalu muat ulang halaman.');
-        if (email !== 'demo@nusantara.test' || password !== demoPassword) throw new Error('Email atau kata sandi demo tidak cocok.');
-        user = { email };
-      }
+      else throw new Error(configured ? 'Supabase belum termuat. Periksa koneksi lalu muat ulang halaman.' : 'Panel admin belum dikonfigurasi. Hubungkan Supabase untuk mengaktifkan login admin.');
       showDashboard(user);
     } catch (error) {
       $('#loginError').textContent = error.message || 'Tidak dapat masuk. Periksa email dan kata sandi.';
@@ -237,11 +261,7 @@
     if (newPassword !== confirmation) { message.textContent = 'Konfirmasi kata sandi belum cocok.'; return; }
     try {
       if (backend?.ready) await backend.changePassword(adminEmail, oldPassword, newPassword);
-      else {
-        if (oldPassword !== demoPassword) throw new Error('Kata sandi saat ini tidak sesuai.');
-        demoPassword = newPassword;
-        sessionStorage.setItem('nj-demo-password', newPassword);
-      }
+      else throw new Error('Hubungkan Supabase untuk mengubah kata sandi admin.');
       message.textContent = 'Kata sandi berhasil diperbarui.';
       $('#oldPass').value = $('#newPass').value = $('#confirmPass').value = '';
     } catch (error) {
@@ -253,7 +273,7 @@
     if (!backend?.ready) {
       $('#loginHelp').textContent = configured
         ? 'Supabase belum termuat. Periksa koneksi lalu muat ulang halaman.'
-        : 'Mode demo lokal: demo@nusantara.test / demo123. Perubahan hanya tersimpan di browser ini.';
+        : 'Panel admin belum dikonfigurasi. Hubungkan Supabase untuk mengaktifkan akses admin.';
       return;
     }
     try {

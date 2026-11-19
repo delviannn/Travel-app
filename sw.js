@@ -1,6 +1,6 @@
-const CACHE='nusantara-journey-v9';
+const CACHE='nusantara-journey-v10';
 const CORE=[
-  './','./index.html','./admin.html','./offline.html','./styles.css','./app.js','./admin.js','./theme.js','./theme-init.js','./manifest.webmanifest','./icon.svg',
+  './','./index.html','./detail.html','./admin.html','./offline.html','./styles.css','./app.js','./detail.js','./admin.js','./theme.js','./theme-init.js','./manifest.webmanifest','./icon.svg',
   './supabase-config.js','./supabase-browser.js',
   './assets/batam-bintan.jpg','./assets/batam-city.jpg','./assets/bali.jpg',
   './assets/labuan-bajo.jpg','./assets/singapore.jpg','./assets/japan.jpg'

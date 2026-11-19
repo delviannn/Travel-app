@@ -38,14 +38,14 @@ function render() {
     `${item.name} ${item.destination} ${item.description}`.toLocaleLowerCase('id').includes(query));
 
   $('#packageGrid').innerHTML = list.map(item => `
-    <article class="card">
+    <a class="card-link" href="./detail.html?id=${encodeURIComponent(item.id)}" aria-label="Lihat detail ${esc(item.name)}"><article class="card">
       <div class="card-image"><img src="${esc(item.image || startingPackages[0].image)}" data-fallback="${esc(item.imageFallback || item.image || startingPackages[0].image)}" alt="Pemandangan destinasi ${esc(item.destination)}" loading="lazy"><span class="card-category">${esc(item.category.toUpperCase())}</span></div>
       <div class="card-body"><div class="card-meta"><span>⌖ ${esc(item.destination)}</span><span>◷ ${esc(item.duration || 'Durasi belum dikonfirmasi')}</span></div>
         <h3>${esc(item.name)}</h3><p>${esc(item.description)}</p>
-        <div class="card-bottom"><div><div class="price-label">HARGA ESTIMASI · PER ORANG</div><div class="price">${item.price ? `Mulai Rp ${money(item.price)}` : 'Hubungi kami'}</div></div>
-          <button class="detail-link" data-detail="${esc(item.id)}">Lihat detail ↗</button></div>
+        <div class="card-bottom"><div><div class="price-label">HARGA MULAI &middot; PER ORANG</div><div class="price">${item.price ? `Mulai Rp ${money(item.price)}` : 'Hubungi kami'}</div></div>
+          <span class="detail-link">Lihat detail &rarr;</span></div>
       </div>
-    </article>`).join('');
+    </article></a>`).join('');
   $('#emptyState').classList.toggle('hidden', list.length > 0 || (backend?.ready && !catalogLoaded));
   const totalVisible = packages.filter(item => item.visible !== false).length;
   $('#resultCount').textContent = `Menampilkan ${list.length} dari ${totalVisible} paket`;
@@ -56,27 +56,6 @@ function render() {
     button.setAttribute('aria-pressed', String(selected));
   });
   observeReveals($('#packageGrid'));
-}
-
-function detail(id) {
-  const item = packages.find(entry => entry.id === id && entry.visible !== false);
-  if (!item) {
-    $('#detailContent').innerHTML = '<h2>Paket tidak tersedia</h2><p class="muted">Paket ini mungkin sudah tidak ditampilkan. Kembali ke katalog untuk melihat pilihan lain.</p><a class="button navy" href="#paket" data-close="detailDialog">Kembali ke katalog</a>';
-    $('#detailDialog').showModal();
-    return;
-  }
-  const message = `Halo Nusantara Journey, saya ingin bertanya tentang paket ${item.name} (${item.destination}). Mohon info jadwal, harga terbaru, dan fasilitasnya.`;
-  $('#detailContent').innerHTML = `
-    <img class="detail-img" src="${esc(item.image || startingPackages[0].image)}" data-fallback="${esc(item.imageFallback || item.image || startingPackages[0].image)}" alt="${esc(item.destination)}">
-    <div class="eyebrow dark">${esc(item.category.toUpperCase())} · ${esc(item.destination)}</div><h2>${esc(item.name)}</h2>
-    <div class="detail-meta">⌖ ${esc(item.destination)} &nbsp; · &nbsp; ◷ ${esc(item.duration || 'Durasi belum dikonfirmasi')}</div>
-    <p class="muted">${esc(item.description)}</p><div class="detail-columns">
-      <div><h3>Rencana itinerary</h3><ul>${(item.itinerary || []).map(entry => `<li>${esc(entry)}</li>`).join('') || '<li>Itinerary menunggu konfirmasi.</li>'}</ul></div>
-      <div><h3>Fasilitas</h3><b>Termasuk</b><ul>${(item.included || []).map(entry => `<li>${esc(entry)}</li>`).join('') || '<li>Menunggu konfirmasi</li>'}</ul><b>Tidak termasuk</b><ul>${(item.excluded || []).map(entry => `<li>${esc(entry)}</li>`).join('') || '<li>Menunggu konfirmasi</li>'}</ul></div>
-    </div><div class="price detail-price">${item.price ? `Estimasi mulai Rp ${money(item.price)} / orang` : 'Hubungi kami untuk informasi harga'}</div>
-    <p class="estimate-warning">Harga dan rencana perjalanan di atas adalah estimasi untuk prototipe. Konfirmasi detail dan ketersediaan kepada tim.</p>
-    <a class="button navy" target="_blank" rel="noopener" href="${waLink(message)}">Tanyakan paket via WhatsApp ↗</a>`;
-  $('#detailDialog').showModal();
 }
 
 async function loadCatalog({ quiet = false } = {}) {
@@ -100,7 +79,7 @@ async function loadCatalog({ quiet = false } = {}) {
       packages = await backend.loadPackages();
       catalogLoaded = true;
       try { localStorage.setItem('nj-public-packages', JSON.stringify(packages)); } catch { /* Storage may be unavailable in private browsing. */ }
-      $('#catalogStatus').textContent = 'Harga paket adalah estimasi. Tanyakan ketersediaan dan detail terbaru kepada tim.';
+      $('#catalogStatus').textContent = '';
       render();
     } catch (error) {
       $('#catalogStatus').textContent = 'Katalog belum dapat dimuat. Paket yang sudah tampil tetap dipertahankan; coba muat ulang.';
@@ -121,17 +100,15 @@ async function loadCatalog({ quiet = false } = {}) {
   }
 }
 
+async function loadTestimonials() {
+  try { const reviews = await backend.loadReviews(); const box = $('#testimonialList'); if (!reviews.length) return; box.innerHTML = reviews.map(review => `<article class="testimonial-card"><div class="testimonial-stars" aria-label="${review.rating} dari 5 bintang">${'&#9733;'.repeat(review.rating)}${'&#9734;'.repeat(5-review.rating)}</div><blockquote>&ldquo;${esc(review.quote)}&rdquo;</blockquote><p>${esc(review.author)}${review.package_name ? ` &middot; ${esc(review.package_name)}` : ''}</p></article>`).join(''); } catch (error) { console.warn('Ulasan belum dapat dimuat:', error); }
+}
+
 function refreshWhenReturning() {
   if (document.visibilityState === 'hidden' || Date.now() - lastCatalogRefresh < 1200) return;
   loadCatalog({ quiet: true });
 }
 
-$$('[data-close]').forEach(button => button.addEventListener('click', () => $('#' + button.dataset.close).close()));
-$('#detailBack').addEventListener('click', () => $('#detailDialog').close());
-$('#packageGrid').addEventListener('click', event => {
-  const button = event.target.closest('[data-detail]');
-  if (button) detail(button.dataset.detail);
-});
 function useFallbackImage(event) {
   const image = event.target.closest('img[data-fallback]');
   if (!image || image.dataset.fallbackUsed) return;
@@ -139,11 +116,6 @@ function useFallbackImage(event) {
   image.src = image.dataset.fallback;
 }
 $('#packageGrid').addEventListener('error', useFallbackImage, true);
-$('#detailContent').addEventListener('error', useFallbackImage, true);
-$('#detailContent').addEventListener('click', event => {
-  const closeLink = event.target.closest('[data-close="detailDialog"]');
-  if (closeLink) { event.preventDefault(); $('#detailDialog').close(); document.querySelector('#paket').scrollIntoView(); }
-});
 $('#searchInput').addEventListener('input', render);
 $('#categoryFilter').addEventListener('change', render);
 $('#retryCatalog').addEventListener('click', () => loadCatalog());
@@ -270,3 +242,4 @@ if ('serviceWorker' in navigator) window.addEventListener('load', () => navigato
 
 render();
 if (backendConfigured) loadCatalog();
+if (backend?.ready) loadTestimonials();

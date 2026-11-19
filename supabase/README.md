@@ -12,13 +12,13 @@ insert into public.admin_profiles (id, display_name)
 values ('00000000-0000-0000-0000-000000000000', 'Admin Nusantara Journey');
 ```
 
-Only users with an active `admin_profiles` row can modify catalog data or upload photos. Public visitors can only read visible packages.
+Only users with an active `admin_profiles` row can modify catalog data or upload photos, and can manage customer reviews. Public visitors can only read visible packages and reviews. Reapply `schema.sql` after review moderation is added so the `customer_reviews` table and access policies are created.
 
 ## 2. Configure the website
 
 Copy the Project URL and **publishable** key (or legacy anon key) from **Project Settings → API** into `supabase-config.js`. These two values are intended for browser use with the database protected by RLS. Never put a `service_role` key in this file or any frontend code.
 
-The committed values are placeholders, so the site continues to show its local demo until you replace them. Once configured, the site reads the catalog and admin changes from Supabase.
+The committed values are placeholders, so the site shows its starter catalog. Admin login and shared review moderation stay unavailable until Supabase is configured. Once configured, the site reads the catalog, customer reviews, and admin changes from Supabase.
 
 ## 3. Enable AI descriptions
 
@@ -35,7 +35,7 @@ Do not commit a real key. `.env.example` lists the values to prepare; `.gitignor
 
 ## 4. Test accounts and data
 
-Sign in through the site's Admin button using the account created in Supabase Auth. Add or edit catalog items there; package photos are limited to JPG, PNG, or WebP and 5 MB. The example prices and itineraries in the starter site are estimates and should be reviewed before they become official offers.
+Open `/admin.html` directly and sign in using the account created in Supabase Auth. The public navigation does not link to the admin page. Add or edit catalog items there; package photos are limited to JPG, PNG, or WebP and 5 MB. The example prices and itineraries in the starter site are estimates and should be reviewed before they become official offers.
 
 To show the optional starter catalog, run [`seed-estimate-packages.sql`](seed-estimate-packages.sql) in the Supabase SQL Editor. It inserts example prices and itineraries marked as estimates; re-running it does not duplicate those packages.
 

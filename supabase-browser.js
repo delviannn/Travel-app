@@ -36,6 +36,32 @@
     return data.map(mapPackage);
   }
 
+  async function loadReviews(includeHidden = false) {
+    let query = client.from('customer_reviews').select('*').order('created_at', { ascending: false });
+    if (!includeHidden) query = query.eq('visible', true);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data;
+  }
+
+  async function saveReview(review) {
+    const { error } = await client.from('customer_reviews').insert({
+      author: review.author, package_name: review.package_name || '', quote: review.quote,
+      rating: review.rating, visible: review.visible !== false
+    });
+    if (error) throw error;
+  }
+
+  async function setReviewVisible(id, visible) {
+    const { error } = await client.from('customer_reviews').update({ visible }).eq('id', id);
+    if (error) throw error;
+  }
+
+  async function removeReview(id) {
+    const { error } = await client.from('customer_reviews').delete().eq('id', id);
+    if (error) throw error;
+  }
+
   async function savePackage(item, file, oldItem) {
     const { data: authData } = await client.auth.getUser();
     if (!authData.user) throw new Error('Sesi admin berakhir. Silakan masuk kembali.');
@@ -140,7 +166,7 @@
   }
 
   window.njBackend = {
-    ready, client, loadPackages, savePackage, removePackage, setVisible,
+    ready, client, loadPackages, loadReviews, saveReview, setReviewVisible, removeReview, savePackage, removePackage, setVisible,
     signIn, currentAdmin, signOut, changePassword, generateDescription
   };
 })();
