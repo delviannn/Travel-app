@@ -61,7 +61,7 @@
   }
 
   function renderReviews() {
-    $('#reviewAdminList').innerHTML = reviews.map(item => '<article class="admin-list-item review-admin-item"><div class="admin-list-copy"><strong>' + esc(item.author) + ' &middot; ' + '&#9733;'.repeat(item.rating) + '</strong><small>' + esc(item.package_name || 'Tanpa nama paket') + ' &middot; ' + (item.visible ? 'Tampil' : 'Disembunyikan') + '<br>' + esc(item.quote) + '</small></div><div class="admin-actions"><button type="button" data-review-toggle="' + esc(item.id) + '">' + (item.visible ? 'Sembunyikan' : 'Tampilkan') + '</button><button type="button" class="delete" data-review-delete="' + esc(item.id) + '">Hapus</button></div></article>').join('') || '<p class="admin-empty">Belum ada ulasan pelanggan.</p>';
+    $('#reviewAdminList').innerHTML = reviews.map(item => '<article class="admin-list-item review-admin-item"><div class="admin-list-copy"><strong>' + esc(item.author) + ' &middot; ' + '&#9733;'.repeat(item.rating) + '</strong><small>' + esc(item.package_name || 'Tanpa nama paket') + ' &middot; ' + (item.visible ? 'Tampil' : 'Disembunyikan') + '<br>' + esc(item.quote) + '</small></div><div class="admin-actions">' + (item.visible ? '<button type="button" data-review-toggle="' + esc(item.id) + '">Sembunyikan</button>' : '<span class="review-hidden-label">Disembunyikan</span>') + '<button type="button" class="delete" data-review-delete="' + esc(item.id) + '">Hapus</button></div></article>').join('') || '<p class="admin-empty">Belum ada ulasan pelanggan.</p>';
   }
 
   $('#reviewAdminList').addEventListener('click', async event => {
