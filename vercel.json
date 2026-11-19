@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' data: https://sctxitibwdqxiypcgtcs.supabase.co; media-src 'self' https://cdn.coverr.co https://videos.pexels.com https://cdn.pixabay.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://sctxitibwdqxiypcgtcs.supabase.co wss://sctxitibwdqxiypcgtcs.supabase.co; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' data: https://sctxitibwdqxiypcgtcs.supabase.co; media-src 'self' https://cdn.coverr.co https://videos.pexels.com https://cdn.pixabay.com https://sctxitibwdqxiypcgtcs.supabase.co; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://sctxitibwdqxiypcgtcs.supabase.co wss://sctxitibwdqxiypcgtcs.supabase.co; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests"
         },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },

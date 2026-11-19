@@ -131,13 +131,14 @@
     const existingId = $('#editId').value;
     const oldItem = packages.find(item => item.id === existingId);
     const file = $('#pImage').files[0];
+    const videoFile = $('#pVideoFile').files[0];
     const item = {
       id: existingId || crypto.randomUUID(),
       name: $('#pName').value.trim(),
       destination: $('#pDestination').value.trim(),
       category: $('#pCategory').value,
       price: Number($('#pPrice').value) || null,
-      videoUrl: $('#pVideoUrl').value.trim(),
+      videoUrl: videoFile ? '' : $('#pVideoUrl').value.trim(),
       duration: $('#pDuration').value.trim() || 'Belum dikonfirmasi',
       description: $('#pDescription').value.trim(),
       itinerary: lines($('#pItinerary').value),
@@ -148,11 +149,16 @@
       imageAlt: oldItem?.imageAlt || '',
       visible: oldItem?.visible !== false
     };
+    if (videoFile && (videoFile.type !== 'video/mp4' || videoFile.size > 30 * 1024 * 1024)) {
+      $('#packageMessage').textContent = 'Video harus MP4 dengan ukuran maksimal 30 MB.';
+      return;
+    }
     if (item.videoUrl) {
       let video;
       try { video = new URL(item.videoUrl); } catch { video = null; }
+      const supabaseOrigin = window.NJ_SUPABASE_CONFIG?.url ? new URL(window.NJ_SUPABASE_CONFIG.url).origin : '';
       const allowedHosts = ['cdn.coverr.co', 'videos.pexels.com', 'cdn.pixabay.com'];
-      if (!video || video.protocol !== 'https:' || !video.pathname.toLowerCase().endsWith('.mp4') || (!allowedHosts.includes(video.hostname) && video.origin !== location.origin)) {
+      if (!video || video.protocol !== 'https:' || !video.pathname.toLowerCase().endsWith('.mp4') || (!allowedHosts.includes(video.hostname) && video.origin !== location.origin && video.origin !== supabaseOrigin)) {
         $('#packageMessage').textContent = 'Masukkan URL file MP4 langsung dari Coverr, Pexels, Pixabay, atau situs ini.';
         return;
       }
@@ -165,7 +171,7 @@
     $('#packageMessage').textContent = 'Menyimpan perubahan…';
     try {
       if (backend?.ready) {
-        const savedItem = await backend.savePackage(item, file, oldItem);
+        const savedItem = await backend.savePackage(item, file, oldItem, videoFile);
         if (savedItem) item.id = savedItem.id;
         packages = oldItem ? packages.map(existing => existing.id === oldItem.id ? (savedItem || item) : existing) : [savedItem || item, ...packages];
       } else {
