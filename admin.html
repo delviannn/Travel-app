@@ -46,7 +46,8 @@
             <label>Deskripsi<textarea id="pDescription" rows="4" required maxlength="2000" placeholder="Ceritakan pengalaman perjalanan..."></textarea></label>
             <button type="button" id="generateDescription" class="outline-button">✦ Buat draf deskripsi dengan AI</button>
             <p id="packageMessage" class="inline-message" role="status" aria-live="polite"></p>
-            <label>Itinerary<textarea id="pItinerary" rows="4" placeholder="Satu baris untuk setiap hari"></textarea></label>
+            <div class="itinerary-editor-heading"><span class="field-label">Itinerary per hari</span><button type="button" id="addItineraryDay" class="outline-button">+ Tambah hari</button></div>
+            <div id="itineraryDays" class="itinerary-editor"></div>
             <div class="row"><label>Termasuk<textarea id="pIncluded" rows="3" placeholder="Satu fasilitas per baris"></textarea></label><label>Tidak termasuk<textarea id="pExcluded" rows="3" placeholder="Satu fasilitas per baris"></textarea></label></div>
             <label>Upload video MP4 <span class="field-note">Pilih file dari perangkat. Maksimal 30 MB.</span><input id="pVideoFile" type="file" accept="video/mp4"></label>
             <label>Atau tautan video MP4 <span class="field-note">URL file langsung dari Coverr, Pexels, atau Pixabay.</span><input id="pVideoUrl" type="url" inputmode="url" placeholder="https://.../video.mp4"></label>

@@ -30,6 +30,28 @@
       </article>`).join('') || '<p class="admin-empty">Belum ada paket. Tambahkan paket menggunakan formulir.</p>';
   }
 
+  function normalizeItineraryDay(day, index) {
+    if (typeof day === 'object' && day) return { day: day.day || `Hari ${index + 1}`, activities: day.activities || '' };
+    const legacy = String(day || '');
+    const match = legacy.match(/^((?:Hari\s*)?\d+\s*[—–-])\s*/i);
+    return { day: match ? match[1].replace(/[—–-]\s*$/, '').trim() : `Hari ${index + 1}`, activities: match ? legacy.slice(match[0].length) : legacy };
+  }
+
+  function renderItineraryDays(days = []) {
+    const container = $('#itineraryDays');
+    container.innerHTML = (days.length ? days : [{ day: 'Hari 1', activities: '' }]).map((entry, index) => {
+      const day = normalizeItineraryDay(entry, index);
+      return `<article class="itinerary-day-card"><div class="itinerary-day-top"><strong>Hari perjalanan ${index + 1}</strong><button type="button" class="text-button itinerary-day-remove" aria-label="Hapus hari ${index + 1}">Hapus</button></div><label>Nama hari<input data-itinerary-day value="${esc(day.day)}" maxlength="40" placeholder="Hari ${index + 1}"></label><label>Rencana kegiatan<textarea data-itinerary-activities rows="3" maxlength="1000" placeholder="Contoh: Tiba, check-in, dan city tour">${esc(day.activities)}</textarea></label></article>`;
+    }).join('');
+  }
+
+  function readItineraryDays() {
+    return [...$('#itineraryDays').querySelectorAll('.itinerary-day-card')].map((card, index) => ({
+      day: card.querySelector('[data-itinerary-day]').value.trim() || `Hari ${index + 1}`,
+      activities: card.querySelector('[data-itinerary-activities]').value.trim()
+    }));
+  }
+
   function showDashboard(user) {
     adminEmail = user?.email || '';
     $('#loginPanel').classList.add('hidden');
@@ -80,6 +102,7 @@
     $('#formHeading').textContent = 'Tambah paket';
     $('#cancelEdit').classList.add('hidden');
     $('#packageMessage').textContent = '';
+    renderItineraryDays();
   }
 
   function editPackage(item) {
@@ -91,7 +114,7 @@
     $('#pVideoUrl').value = item.videoUrl || '';
     $('#pDuration').value = item.duration || '';
     $('#pDescription').value = item.description || '';
-    $('#pItinerary').value = (item.itinerary || []).join('\n');
+    renderItineraryDays(item.itinerary || []);
     $('#pIncluded').value = (item.included || []).join('\n');
     $('#pExcluded').value = (item.excluded || []).join('\n');
     $('#formHeading').textContent = 'Edit paket';
@@ -104,6 +127,24 @@
   function lines(value) {
     return value.split('\n').map(line => line.trim()).filter(Boolean);
   }
+
+  $('#addItineraryDay').addEventListener('click', () => {
+    const days = readItineraryDays();
+    days.push({ day: `Hari ${days.length + 1}`, activities: '' });
+    renderItineraryDays(days);
+    $('#itineraryDays .itinerary-day-card:last-child [data-itinerary-activities]').focus();
+  });
+
+  $('#itineraryDays').addEventListener('click', event => {
+    const button = event.target.closest('.itinerary-day-remove');
+    if (!button) return;
+    const cards = [...$('#itineraryDays').querySelectorAll('.itinerary-day-card')];
+    const days = cards.filter(card => card !== button.closest('.itinerary-day-card')).map(card => ({
+      day: card.querySelector('[data-itinerary-day]').value,
+      activities: card.querySelector('[data-itinerary-activities]').value
+    }));
+    renderItineraryDays(days);
+  });
 
   $('#loginForm').addEventListener('submit', async event => {
     event.preventDefault();
@@ -136,7 +177,7 @@
       videoUrl: videoFile ? '' : $('#pVideoUrl').value.trim(),
       duration: $('#pDuration').value.trim() || 'Belum dikonfirmasi',
       description: $('#pDescription').value.trim(),
-      itinerary: lines($('#pItinerary').value),
+      itinerary: readItineraryDays().filter(day => day.activities),
       included: lines($('#pIncluded').value),
       excluded: lines($('#pExcluded').value),
       image: oldItem?.image || './assets/batam-bintan.jpg',
@@ -240,7 +281,7 @@
       if (!backend?.ready) throw new Error('Hubungkan Supabase untuk memakai AI.');
       $('#pDescription').value = await backend.generateDescription({
         name, destination, category: $('#pCategory').value,
-        duration: $('#pDuration').value.trim(), itinerary: lines($('#pItinerary').value)
+        duration: $('#pDuration').value.trim(), itinerary: readItineraryDays().filter(day => day.activities).map(day => `${day.day} — ${day.activities}`)
       });
       $('#packageMessage').textContent = 'Draf selesai. Periksa dan sesuaikan sebelum menyimpan.';
     } catch (error) {
@@ -296,5 +337,6 @@
     }
   }
 
+  renderItineraryDays();
   restoreSession();
 })();
