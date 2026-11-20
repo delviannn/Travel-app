@@ -113,7 +113,6 @@
     $('#cancelEdit').classList.add('hidden');
     $('#packageMessage').textContent = '';
     renderItineraryDays();
-    renderPackageItems('includedItems', 'data-included-item');
     renderPackageItems('excludedItems', 'data-excluded-item');
   }
 
@@ -127,7 +126,6 @@
     $('#pDuration').value = item.duration || '';
     $('#pDescription').value = item.description || '';
     renderItineraryDays(item.itinerary || []);
-    renderPackageItems('includedItems', 'data-included-item', item.included || []);
     renderPackageItems('excludedItems', 'data-excluded-item', item.excluded || []);
     $('#formHeading').textContent = 'Edit paket';
     $('#cancelEdit').classList.remove('hidden');
@@ -161,17 +159,15 @@
     $(`#${containerId} .package-item-row:last-child input`).focus();
   }
 
-  $('#addIncludedItem').addEventListener('click', () => addPackageItem('includedItems', 'data-included-item'));
   $('#addExcludedItem').addEventListener('click', () => addPackageItem('excludedItems', 'data-excluded-item'));
   document.querySelector('.package-editor').addEventListener('click', event => {
     const button = event.target.closest('.package-item-remove');
     if (!button) return;
     const row = button.closest('.package-item-row');
     const container = row.parentElement;
-    const attribute = container.id === 'includedItems' ? 'data-included-item' : 'data-excluded-item';
     const items = [...container.querySelectorAll('.package-item-row')].filter(item => item !== row)
       .map(item => item.querySelector('input').value);
-    renderPackageItems(container.id, attribute, items);
+    renderPackageItems(container.id, 'data-excluded-item', items);
   });
 
   $('#loginForm').addEventListener('submit', async event => {
@@ -206,7 +202,7 @@
       duration: $('#pDuration').value.trim() || 'Belum dikonfirmasi',
       description: $('#pDescription').value.trim(),
       itinerary: readItineraryDays().filter(day => day.activities),
-      included: readPackageItems('includedItems', 'data-included-item'),
+      included: [],
       excluded: readPackageItems('excludedItems', 'data-excluded-item'),
       image: oldItem?.image || './assets/batam-bintan.jpg',
       imagePath: oldItem?.imagePath || null,
@@ -366,7 +362,6 @@
   }
 
   renderItineraryDays();
-  renderPackageItems('includedItems', 'data-included-item');
   renderPackageItems('excludedItems', 'data-excluded-item');
   restoreSession();
 })();
