@@ -52,6 +52,16 @@
     }));
   }
 
+  function renderPackageItems(containerId, attribute, items = []) {
+    const container = $(`#${containerId}`);
+    container.innerHTML = (items.length ? items : ['']).map((item, index) => `
+      <div class="package-item-row"><input ${attribute} aria-label="Item ${index + 1}" value="${esc(item)}" maxlength="300" placeholder="Tulis fasilitas"><button type="button" class="text-button package-item-remove" aria-label="Hapus item ${index + 1}">Hapus</button></div>`).join('');
+  }
+
+  function readPackageItems(containerId, attribute) {
+    return [...$(`#${containerId}`).querySelectorAll(`[${attribute}]`)].map(input => input.value.trim()).filter(Boolean);
+  }
+
   function showDashboard(user) {
     adminEmail = user?.email || '';
     $('#loginPanel').classList.add('hidden');
@@ -103,6 +113,8 @@
     $('#cancelEdit').classList.add('hidden');
     $('#packageMessage').textContent = '';
     renderItineraryDays();
+    renderPackageItems('includedItems', 'data-included-item');
+    renderPackageItems('excludedItems', 'data-excluded-item');
   }
 
   function editPackage(item) {
@@ -115,17 +127,13 @@
     $('#pDuration').value = item.duration || '';
     $('#pDescription').value = item.description || '';
     renderItineraryDays(item.itinerary || []);
-    $('#pIncluded').value = (item.included || []).join('\n');
-    $('#pExcluded').value = (item.excluded || []).join('\n');
+    renderPackageItems('includedItems', 'data-included-item', item.included || []);
+    renderPackageItems('excludedItems', 'data-excluded-item', item.excluded || []);
     $('#formHeading').textContent = 'Edit paket';
     $('#cancelEdit').classList.remove('hidden');
     $('#packageMessage').textContent = '';
     $('#pName').focus();
     document.querySelector('.package-editor').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  function lines(value) {
-    return value.split('\n').map(line => line.trim()).filter(Boolean);
   }
 
   $('#addItineraryDay').addEventListener('click', () => {
@@ -144,6 +152,26 @@
       activities: card.querySelector('[data-itinerary-activities]').value
     }));
     renderItineraryDays(days);
+  });
+
+  function addPackageItem(containerId, attribute) {
+    const items = [...$(`#${containerId}`).querySelectorAll(`[${attribute}]`)].map(input => input.value);
+    items.push('');
+    renderPackageItems(containerId, attribute, items);
+    $(`#${containerId} .package-item-row:last-child input`).focus();
+  }
+
+  $('#addIncludedItem').addEventListener('click', () => addPackageItem('includedItems', 'data-included-item'));
+  $('#addExcludedItem').addEventListener('click', () => addPackageItem('excludedItems', 'data-excluded-item'));
+  document.querySelector('.package-editor').addEventListener('click', event => {
+    const button = event.target.closest('.package-item-remove');
+    if (!button) return;
+    const row = button.closest('.package-item-row');
+    const container = row.parentElement;
+    const attribute = container.id === 'includedItems' ? 'data-included-item' : 'data-excluded-item';
+    const items = [...container.querySelectorAll('.package-item-row')].filter(item => item !== row)
+      .map(item => item.querySelector('input').value);
+    renderPackageItems(container.id, attribute, items);
   });
 
   $('#loginForm').addEventListener('submit', async event => {
@@ -178,8 +206,8 @@
       duration: $('#pDuration').value.trim() || 'Belum dikonfirmasi',
       description: $('#pDescription').value.trim(),
       itinerary: readItineraryDays().filter(day => day.activities),
-      included: lines($('#pIncluded').value),
-      excluded: lines($('#pExcluded').value),
+      included: readPackageItems('includedItems', 'data-included-item'),
+      excluded: readPackageItems('excludedItems', 'data-excluded-item'),
       image: oldItem?.image || './assets/batam-bintan.jpg',
       imagePath: oldItem?.imagePath || null,
       imageAlt: oldItem?.imageAlt || '',
@@ -338,5 +366,7 @@
   }
 
   renderItineraryDays();
+  renderPackageItems('includedItems', 'data-included-item');
+  renderPackageItems('excludedItems', 'data-excluded-item');
   restoreSession();
 })();

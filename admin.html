@@ -48,7 +48,10 @@
             <p id="packageMessage" class="inline-message" role="status" aria-live="polite"></p>
             <div class="itinerary-editor-heading"><span class="field-label">Itinerary per hari</span><button type="button" id="addItineraryDay" class="outline-button">+ Tambah hari</button></div>
             <div id="itineraryDays" class="itinerary-editor"></div>
-            <div class="row"><label>Termasuk<textarea id="pIncluded" rows="3" placeholder="Satu fasilitas per baris"></textarea></label><label>Tidak termasuk<textarea id="pExcluded" rows="3" placeholder="Satu fasilitas per baris"></textarea></label></div>
+            <div class="package-items-editor">
+              <section><div class="itinerary-editor-heading"><span class="field-label">Termasuk</span><button type="button" id="addIncludedItem" class="outline-button">+ Tambah item</button></div><div id="includedItems" class="package-item-list"></div></section>
+              <section><div class="itinerary-editor-heading"><span class="field-label">Tidak termasuk</span><button type="button" id="addExcludedItem" class="outline-button">+ Tambah item</button></div><div id="excludedItems" class="package-item-list"></div></section>
+            </div>
             <label>Upload video MP4 <span class="field-note">Pilih file dari perangkat. Maksimal 30 MB.</span><input id="pVideoFile" type="file" accept="video/mp4"></label>
             <label>Atau tautan video MP4 <span class="field-note">URL file langsung dari Coverr, Pexels, atau Pixabay.</span><input id="pVideoUrl" type="url" inputmode="url" placeholder="https://.../video.mp4"></label>
             <label>Foto paket <span class="field-note">JPG, PNG, WebP · maksimal 5 MB</span><input id="pImage" type="file" accept="image/jpeg,image/png,image/webp"></label>
