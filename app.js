@@ -107,7 +107,7 @@ $('#reviewForm').addEventListener('submit', async event => {
   button.disabled = true; message.textContent = 'Mengirim ulasan...';
   try {
     await backend.saveReview({ author: $('#reviewAuthor').value.trim(), package_name: $('#reviewPackage').value.trim(), rating: Number($('#reviewRating').value), quote: $('#reviewQuote').value.trim() });
-    form.reset(); message.textContent = 'Terima kasih! Ulasanmu sudah tampil di website.'; await loadTestimonials();
+    form.reset(); message.textContent = 'Terima kasih! Ulasanmu terkirim dan akan tampil setelah ditinjau admin.';
   } catch (error) { message.textContent = error.message || 'Ulasan gagal dikirim. Coba lagi sebentar.'; }
   finally { button.disabled = false; }
 });

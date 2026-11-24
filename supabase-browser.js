@@ -51,7 +51,7 @@
   async function saveReview(review) {
     const { error } = await client.from('customer_reviews').insert({
       author: review.author, package_name: review.package_name || '', quote: review.quote,
-      rating: review.rating, visible: true
+      rating: review.rating, visible: false
     });
     if (error) throw error;
   }

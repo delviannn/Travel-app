@@ -56,13 +56,31 @@ create index if not exists tour_packages_visible_order_idx
 
 create table if not exists public.customer_reviews (
   id uuid primary key default gen_random_uuid(),
-  author text not null check (length(trim(author)) > 0),
-  package_name text not null default '',
-  quote text not null check (length(trim(quote)) > 0),
+  author text not null check (length(trim(author)) between 1 and 100),
+  package_name text not null default '' check (length(package_name) <= 120),
+  quote text not null check (length(trim(quote)) between 1 and 1200),
   rating smallint not null default 5 check (rating between 1 and 5),
-  visible boolean not null default true,
+  visible boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+alter table public.customer_reviews alter column visible set default false;
+do $review_constraints$
+begin
+  if not exists (select 1 from pg_constraint where conrelid = 'public.customer_reviews'::regclass and conname = 'customer_reviews_author_length_check') then
+    alter table public.customer_reviews add constraint customer_reviews_author_length_check
+      check (length(trim(author)) between 1 and 100) not valid;
+  end if;
+  if not exists (select 1 from pg_constraint where conrelid = 'public.customer_reviews'::regclass and conname = 'customer_reviews_package_name_length_check') then
+    alter table public.customer_reviews add constraint customer_reviews_package_name_length_check
+      check (length(package_name) <= 120) not valid;
+  end if;
+  if not exists (select 1 from pg_constraint where conrelid = 'public.customer_reviews'::regclass and conname = 'customer_reviews_quote_length_check') then
+    alter table public.customer_reviews add constraint customer_reviews_quote_length_check
+      check (length(trim(quote)) between 1 and 1200) not valid;
+  end if;
+end
+$review_constraints$;
 
 create index if not exists customer_reviews_public_order_idx
   on public.customer_reviews (visible, created_at desc);
@@ -133,7 +151,7 @@ create policy "public can read visible customer reviews" on public.customer_revi
   for select to anon, authenticated using (visible or (select public.is_active_admin()));
 drop policy if exists "public can submit customer reviews" on public.customer_reviews;
 create policy "public can submit customer reviews" on public.customer_reviews
-  for insert to anon, authenticated with check (visible = true);
+  for insert to anon, authenticated with check (visible = false);
 drop policy if exists "admins manage customer reviews" on public.customer_reviews;
 create policy "admins manage customer reviews" on public.customer_reviews
   for all to authenticated using ((select public.is_active_admin()))
