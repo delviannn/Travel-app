@@ -25,6 +25,17 @@ if (heroVisual) {
   const heroPhoto = heroVisual.querySelector('.hero-photo');
   const heroPlace = heroVisual.querySelector('.hero-photo-label b');
   const heroIndex = heroVisual.querySelector('.hero-photo-index');
+  const previousHeroSlide = document.createElement('button');
+  previousHeroSlide.type = 'button';
+  previousHeroSlide.className = 'hero-slide-control hero-slide-previous';
+  previousHeroSlide.setAttribute('aria-label', 'Foto sebelumnya');
+  previousHeroSlide.textContent = '‹';
+  const nextHeroSlide = document.createElement('button');
+  nextHeroSlide.type = 'button';
+  nextHeroSlide.className = 'hero-slide-control hero-slide-next';
+  nextHeroSlide.setAttribute('aria-label', 'Foto berikutnya');
+  nextHeroSlide.textContent = '›';
+  heroVisual.append(previousHeroSlide, nextHeroSlide);
   let heroSlideIndex = 0;
   let heroTimer;
   const showHeroSlide = index => {
@@ -49,6 +60,14 @@ if (heroVisual) {
     window.clearInterval(heroTimer);
     heroTimer = null;
   };
+  const moveHeroSlide = direction => {
+    heroSlideIndex = (heroSlideIndex + direction + heroSlides.length) % heroSlides.length;
+    showHeroSlide(heroSlideIndex);
+    stopHeroCarousel();
+    startHeroCarousel();
+  };
+  previousHeroSlide.addEventListener('click', () => moveHeroSlide(-1));
+  nextHeroSlide.addEventListener('click', () => moveHeroSlide(1));
   heroVisual.addEventListener('mouseenter', stopHeroCarousel);
   heroVisual.addEventListener('mouseleave', startHeroCarousel);
   heroVisual.addEventListener('focusin', stopHeroCarousel);
