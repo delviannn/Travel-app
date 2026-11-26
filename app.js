@@ -12,6 +12,52 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
 const waLink = (message = 'Halo Nusantara Journey, saya ingin bertanya tentang paket perjalanan.') =>
   `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(message)}`;
 
+const heroSlides = [
+  { src: './assets/bali.jpg', alt: 'Pura Ulun Danu Bratan di Bali', place: 'Bali', country: 'Indonesia' },
+  { src: './assets/batam-bintan.jpg', alt: 'Pemandangan Batam dan Bintan', place: 'Batam · Bintan', country: 'Indonesia' },
+  { src: './assets/labuan-bajo.jpg', alt: 'Kepulauan di Labuan Bajo', place: 'Labuan Bajo', country: 'Indonesia' },
+  { src: './assets/singapore.jpg', alt: 'Pemandangan kota Singapura', place: 'Singapore', country: 'Asia' },
+  { src: './assets/japan.jpg', alt: 'Pemandangan Jepang', place: 'Japan', country: 'Asia' },
+  { src: './assets/batam-city.jpg', alt: 'Pemandangan kota Batam', place: 'Batam', country: 'Indonesia' }
+];
+const heroVisual = $('.hero-visual');
+if (heroVisual) {
+  const heroPhoto = heroVisual.querySelector('.hero-photo');
+  const heroPlace = heroVisual.querySelector('.hero-photo-label b');
+  const heroIndex = heroVisual.querySelector('.hero-photo-index');
+  let heroSlideIndex = 0;
+  let heroTimer;
+  const showHeroSlide = index => {
+    const slide = heroSlides[index];
+    heroPhoto.classList.add('is-changing');
+    window.setTimeout(() => {
+      heroPhoto.src = slide.src;
+      heroPhoto.alt = slide.alt;
+      heroPlace.innerHTML = `${slide.place} <i>·</i> ${slide.country}`;
+      heroIndex.innerHTML = `${String(index + 1).padStart(2, '0')} <i></i> ${String(heroSlides.length).padStart(2, '0')}`;
+      heroPhoto.classList.remove('is-changing');
+    }, 220);
+  };
+  const startHeroCarousel = () => {
+    if (heroTimer || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    heroTimer = window.setInterval(() => {
+      heroSlideIndex = (heroSlideIndex + 1) % heroSlides.length;
+      showHeroSlide(heroSlideIndex);
+    }, 5000);
+  };
+  const stopHeroCarousel = () => {
+    window.clearInterval(heroTimer);
+    heroTimer = null;
+  };
+  heroVisual.addEventListener('mouseenter', stopHeroCarousel);
+  heroVisual.addEventListener('mouseleave', startHeroCarousel);
+  heroVisual.addEventListener('focusin', stopHeroCarousel);
+  heroVisual.addEventListener('focusout', event => {
+    if (!heroVisual.contains(event.relatedTarget)) startHeroCarousel();
+  });
+  startHeroCarousel();
+}
+
 const startingPackages = [
   { id: 'batam-bintan', name: 'Batam–Bintan Escape', destination: 'Batam · Bintan', category: 'Domestik', duration: '3 hari 2 malam · estimasi', price: 1850000, description: 'Jelajahi suasana kota Batam dan pesona pulau Bintan dalam satu perjalanan. Rute dan fasilitas final dikonfirmasi saat konsultasi.', itinerary: ['Hari 1 — Tiba di Batam, penjemputan dan city tour (rencana)', 'Hari 2 — Perjalanan menuju Bintan dan waktu bebas (rencana)', 'Hari 3 — Sarapan, persiapan kembali (rencana)'], included: ['Transportasi lokal (rencana)', 'Akomodasi 2 malam (rencana)'], excluded: ['Tiket perjalanan menuju Batam', 'Pengeluaran pribadi'], image: './assets/batam-bintan.jpg', visible: true },
   { id: 'batam-city', name: 'Batam City Discovery', destination: 'Batam', category: 'Domestik', duration: '1 hari · estimasi', price: 450000, description: 'Kenali sudut kota Batam dan tempat menariknya bersama perjalanan city tour. Rute dan tiket masuk perlu dikonfirmasi.', itinerary: ['Hari 1 — City tour Batam (rencana)'], included: ['Transportasi lokal (rencana)'], excluded: ['Makan dan tiket masuk', 'Pengeluaran pribadi'], image: './assets/batam-city.jpg', visible: true },
