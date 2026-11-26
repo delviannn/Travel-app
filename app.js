@@ -22,6 +22,7 @@ const heroSlides = [
 ];
 const heroVisual = $('.hero-visual');
 if (heroVisual) {
+  const heroCarouselRegion = heroVisual.closest('.hero') || heroVisual;
   const heroPhoto = heroVisual.querySelector('.hero-photo');
   const heroPlace = heroVisual.querySelector('.hero-photo-label b');
   const heroIndex = heroVisual.querySelector('.hero-photo-index');
@@ -38,6 +39,8 @@ if (heroVisual) {
   heroVisual.append(previousHeroSlide, nextHeroSlide);
   let heroSlideIndex = 0;
   let heroTimer;
+  let heroPointerInside = false;
+  let heroFocusInside = false;
   const showHeroSlide = index => {
     const slide = heroSlides[index];
     heroPhoto.classList.add('is-changing');
@@ -64,15 +67,27 @@ if (heroVisual) {
     heroSlideIndex = (heroSlideIndex + direction + heroSlides.length) % heroSlides.length;
     showHeroSlide(heroSlideIndex);
     stopHeroCarousel();
-    startHeroCarousel();
+    if (!heroPointerInside && !heroFocusInside) startHeroCarousel();
   };
   previousHeroSlide.addEventListener('click', () => moveHeroSlide(-1));
   nextHeroSlide.addEventListener('click', () => moveHeroSlide(1));
-  heroVisual.addEventListener('mouseenter', stopHeroCarousel);
-  heroVisual.addEventListener('mouseleave', startHeroCarousel);
-  heroVisual.addEventListener('focusin', stopHeroCarousel);
-  heroVisual.addEventListener('focusout', event => {
-    if (!heroVisual.contains(event.relatedTarget)) startHeroCarousel();
+  heroCarouselRegion.addEventListener('mouseenter', () => {
+    heroPointerInside = true;
+    stopHeroCarousel();
+  });
+  heroCarouselRegion.addEventListener('mouseleave', () => {
+    heroPointerInside = false;
+    if (!heroFocusInside) startHeroCarousel();
+  });
+  heroCarouselRegion.addEventListener('focusin', () => {
+    heroFocusInside = true;
+    stopHeroCarousel();
+  });
+  heroCarouselRegion.addEventListener('focusout', event => {
+    if (!heroCarouselRegion.contains(event.relatedTarget)) {
+      heroFocusInside = false;
+      if (!heroPointerInside) startHeroCarousel();
+    }
   });
   startHeroCarousel();
 }

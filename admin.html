@@ -23,7 +23,8 @@
       <form id="loginForm" class="admin-form">
         <label>Email<input type="email" id="loginEmail" required autocomplete="username" placeholder="Email admin"></label>
         <label>Kata sandi<input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Kata sandi"></label>
-        <button class="button navy" type="submit">Masuk ke dashboard <span>→</span></button>
+        <div id="loginCaptcha" class="captcha-slot" aria-label="Verifikasi keamanan"></div>
+        <button id="loginSubmit" class="button navy" type="submit">Masuk ke dashboard <span>→</span></button>
       </form>
       <p id="loginError" class="error" role="alert"></p>
       <p class="admin-hint"><a href="./index.html#paket">Lihat katalog publik</a></p>
@@ -65,6 +66,7 @@
             <label>Kata sandi saat ini<input id="oldPass" type="password" autocomplete="current-password"></label>
             <label>Kata sandi baru<input id="newPass" type="password" autocomplete="new-password"></label>
             <label>Ulangi kata sandi baru<input id="confirmPass" type="password" autocomplete="new-password"></label>
+            <div id="passwordCaptcha" class="captcha-slot" aria-label="Verifikasi keamanan"></div>
             <button id="changePass" class="outline-button" type="button">Simpan kata sandi</button><p id="passMessage" class="inline-message" role="status"></p>
           </details>
         </section>

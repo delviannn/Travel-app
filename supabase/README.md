@@ -3,7 +3,7 @@
 ## 1. Create the project and database
 
 1. Create a Supabase project.
-2. Open **SQL Editor**, paste and run [`schema.sql`](schema.sql).
+2. Open **SQL Editor**, paste and run [`schema.sql`](schema.sql). The schema includes a per-admin limit of five AI description requests per minute.
 3. In **Authentication → Users**, create the first admin account with email and password.
 4. Copy that user's UUID, then run this in SQL Editor (replace the sample UUID and name):
 
@@ -31,6 +31,8 @@ supabase secrets set GEMINI_API_KEY=YOUR_GEMINI_API_KEY GEMINI_MODEL=gemini-3.5-
 supabase functions deploy generate-package-description
 ```
 
+On an existing project, run [`harden-ai-abuse.sql`](harden-ai-abuse.sql) in the SQL Editor before deploying the updated function. The function fails closed until this quota migration is installed. Its request body is capped at 8 KB and browser origins are restricted to the Vercel site, GitHub Pages, and local development. If the site uses another domain, set the Edge Function secret `ALLOWED_ORIGINS` to a comma-separated list of exact origins, then redeploy.
+
 Do not commit a real key. `.env.example` lists the values to prepare; `.gitignore` excludes local `.env` files.
 
 ## 4. Test accounts and data
@@ -43,5 +45,7 @@ To show the optional starter catalog, run [`seed-estimate-packages.sql`](seed-es
 
 - `schema.sql` can be reapplied safely for policies and table setup; it does not create demo admin users.
 - Password changes re-check the current password and then use Supabase Auth.
+- Admin password sign-in is protected by Supabase Auth's built-in IP rate limits. For bot protection, create a Cloudflare Turnstile widget for the site's domains, set its public site key as `captchaSiteKey` in `supabase-config.js`, and enable CAPTCHA under **Supabase Dashboard → Authentication → Bot and Abuse Protection** using the matching Turnstile secret. Keep the secret only in Supabase. Apply a stricter sign-in/token rate limit in **Authentication → Rate Limits** and enable MFA for the admin account.
 - Public images live in a public Storage bucket; only active admins can upload, update, or remove them.
+- Public review submissions are intentionally anonymous and hidden pending approval. The database validates their size and content fields, but does not currently enforce per-IP submission limits; monitor for spam and add a server-side CAPTCHA/rate-limit gate before a high-traffic launch.
 - No online booking or payment is implemented; customers still confirm with the team over WhatsApp.

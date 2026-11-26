@@ -139,8 +139,10 @@
     if (error) throw error;
   }
 
-  async function signIn(email, password) {
-    const { data, error } = await client.auth.signInWithPassword({ email, password });
+  async function signIn(email, password, captchaToken = '') {
+    const credentials = { email, password };
+    if (captchaToken) credentials.options = { captchaToken };
+    const { data, error } = await client.auth.signInWithPassword(credentials);
     if (error) throw error;
     try {
       await requireAdmin(data.user);
@@ -170,8 +172,10 @@
     if (error) throw error;
   }
 
-  async function changePassword(email, currentPassword, newPassword) {
-    const { error: verifyError } = await client.auth.signInWithPassword({ email, password: currentPassword });
+  async function changePassword(email, currentPassword, newPassword, captchaToken = '') {
+    const credentials = { email, password: currentPassword };
+    if (captchaToken) credentials.options = { captchaToken };
+    const { error: verifyError } = await client.auth.signInWithPassword(credentials);
     if (verifyError) throw new Error('Kata sandi saat ini tidak sesuai.');
     const { error } = await client.auth.updateUser({ password: newPassword });
     if (error) throw error;

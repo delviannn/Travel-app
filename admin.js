@@ -1,5 +1,6 @@
 (() => {
   const backend = window.njBackend;
+  const siteConfig = window.NJ_SUPABASE_CONFIG || {};
   const configured = Boolean(window.NJ_SUPABASE_CONFIG?.url &&
     !window.NJ_SUPABASE_CONFIG.url.includes('YOUR_PROJECT_REF') &&
     window.NJ_SUPABASE_CONFIG.anonKey && !window.NJ_SUPABASE_CONFIG.anonKey.includes('YOUR_SUPABASE'));
@@ -11,6 +12,52 @@
   let packages = [];
   let reviews = [];
   let adminEmail = '';
+  const captchaSiteKey = siteConfig.captchaSiteKey || '';
+  const captchaTokens = { login: '', password: '' };
+  const captchaWidgets = { login: null, password: null };
+  const captchaPending = { login: false, password: false };
+
+  function syncCaptchaButton(kind) {
+    if (!captchaSiteKey) return;
+    const button = kind === 'login' ? $('#loginSubmit') : $('#changePass');
+    button.disabled = captchaPending[kind] || !captchaTokens[kind];
+  }
+
+  function resetCaptcha(kind) {
+    captchaTokens[kind] = '';
+    if (captchaWidgets[kind] !== null && window.turnstile) window.turnstile.reset(captchaWidgets[kind]);
+    syncCaptchaButton(kind);
+  }
+
+  if (captchaSiteKey) {
+    syncCaptchaButton('login');
+    syncCaptchaButton('password');
+    const renderCaptcha = kind => {
+      if (captchaWidgets[kind] !== null || !window.turnstile) return;
+      const container = kind === 'login' ? $('#loginCaptcha') : $('#passwordCaptcha');
+      captchaWidgets[kind] = window.turnstile.render(container, {
+        sitekey: captchaSiteKey,
+        callback: token => { captchaTokens[kind] = token; syncCaptchaButton(kind); },
+        'expired-callback': () => { captchaTokens[kind] = ''; syncCaptchaButton(kind); },
+        'error-callback': () => { captchaTokens[kind] = ''; syncCaptchaButton(kind); }
+      });
+    };
+    const captchaScript = document.createElement('script');
+    captchaScript.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    captchaScript.async = true;
+    captchaScript.defer = true;
+    captchaScript.onload = () => {
+      renderCaptcha('login');
+      $('.password-settings').addEventListener('toggle', event => {
+        if (event.currentTarget.open) renderCaptcha('password');
+      });
+    };
+    captchaScript.onerror = () => {
+      $('#loginError').textContent = 'Verifikasi keamanan gagal dimuat. Periksa koneksi, lalu muat ulang halaman.';
+      $('#passMessage').textContent = 'Verifikasi keamanan gagal dimuat. Muat ulang halaman.';
+    };
+    document.head.append(captchaScript);
+  }
 
   function showMessage(message, kind = '') {
     const node = $('#adminNotice');
@@ -172,16 +219,28 @@
 
   $('#loginForm').addEventListener('submit', async event => {
     event.preventDefault();
+    if (captchaSiteKey && !captchaTokens.login) {
+      $('#loginError').textContent = 'Selesaikan verifikasi keamanan terlebih dahulu.';
+      return;
+    }
     const email = $('#loginEmail').value.trim();
     const password = $('#loginPassword').value;
+    const button = $('#loginSubmit');
+    const captchaToken = captchaTokens.login;
+    captchaPending.login = true;
+    button.disabled = true;
     $('#loginError').textContent = '';
     try {
       let user;
-      if (backend?.ready) user = await backend.signIn(email, password);
+      if (backend?.ready) user = await backend.signIn(email, password, captchaToken);
       else throw new Error(configured ? 'Supabase belum termuat. Periksa koneksi lalu muat ulang halaman.' : 'Panel admin belum dikonfigurasi. Hubungkan Supabase untuk mengaktifkan login admin.');
       showDashboard(user);
     } catch (error) {
       $('#loginError').textContent = error.message || 'Tidak dapat masuk. Periksa email dan kata sandi.';
+    } finally {
+      captchaPending.login = false;
+      resetCaptcha('login');
+      if (!captchaSiteKey) button.disabled = false;
     }
   });
 
@@ -336,13 +395,20 @@
     const confirmation = $('#confirmPass').value;
     if (newPassword.length < 8) { message.textContent = 'Kata sandi baru minimal 8 karakter.'; return; }
     if (newPassword !== confirmation) { message.textContent = 'Konfirmasi kata sandi belum cocok.'; return; }
+    if (captchaSiteKey && !captchaTokens.password) { message.textContent = 'Selesaikan verifikasi keamanan terlebih dahulu.'; return; }
+    const captchaToken = captchaTokens.password;
+    captchaPending.password = true;
+    syncCaptchaButton('password');
     try {
-      if (backend?.ready) await backend.changePassword(adminEmail, oldPassword, newPassword);
+      if (backend?.ready) await backend.changePassword(adminEmail, oldPassword, newPassword, captchaToken);
       else throw new Error('Hubungkan Supabase untuk mengubah kata sandi admin.');
       message.textContent = 'Kata sandi berhasil diperbarui.';
       $('#oldPass').value = $('#newPass').value = $('#confirmPass').value = '';
     } catch (error) {
       message.textContent = error.message || 'Kata sandi gagal diperbarui.';
+    } finally {
+      captchaPending.password = false;
+      resetCaptcha('password');
     }
   });
 
