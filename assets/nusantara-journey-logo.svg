@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 860" width="1000" height="860" role="img" aria-label="Nusantara Journey">
+  <defs>
+    <linearGradient id="midGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5B7CF5"/>
+      <stop offset="48%" stop-color="#A678C8"/>
+      <stop offset="100%" stop-color="#F072A8"/>
+    </linearGradient>
+    <linearGradient id="peachGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F5A7A0"/>
+      <stop offset="100%" stop-color="#F8C2B3"/>
+    </linearGradient>
+    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7CE8E8"/>
+      <stop offset="100%" stop-color="#A5EDE9"/>
+    </linearGradient>
+  </defs>
+  <path d="M 205 265 C 90 370 25 550 55 695 C 80 820 230 885 460 840 C 310 855 175 815 135 715 C 95 615 120 425 205 265 Z" fill="url(#tealGrad)"/>
+  <path d="M 615 55 C 800 15 935 55 975 175 C 1005 275 925 470 795 615 C 905 445 955 300 935 190 C 915 85 790 45 615 55 Z" fill="url(#tealGrad)"/>
+  <path d="M 125 670 L 250 345 L 425 345 L 330 670 Z" fill="#4ED3D3"/>
+  <path d="M 330 670 L 425 345 L 565 505 L 475 670 Z" fill="url(#midGrad)"/>
+  <path d="M 475 670 L 565 505 L 655 255 L 805 255 L 665 670 Z" fill="url(#peachGrad)"/>
+  <path d="M 665 225 L 685 145 L 885 145 L 835 225 Z" fill="#F2A29A"/>
+  <text x="500" y="745" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="800" font-style="italic" letter-spacing="1.5" fill="#2B2B2B">NUSANTARA JOURNEY</text>
+</svg>
