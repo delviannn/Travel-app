@@ -1,2 +1,5 @@
 [functions.generate-package-description]
 verify_jwt = true
+
+[functions.submit-public-review]
+verify_jwt = false

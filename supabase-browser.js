@@ -49,11 +49,19 @@
   }
 
   async function saveReview(review) {
-    const { error } = await client.from('customer_reviews').insert({
-      author: review.author, package_name: review.package_name || '', quote: review.quote,
-      rating: review.rating, visible: false
-    });
-    if (error) throw error;
+    const { data, error } = await client.functions.invoke('submit-public-review', { body: review });
+    if (error) {
+      let message = error.message || 'Ulasan gagal dikirim. Coba lagi sebentar.';
+      try {
+        const response = error.context;
+        if (response && typeof response.json === 'function') {
+          const body = await response.json();
+          if (typeof body?.error === 'string') message = body.error;
+        }
+      } catch { /* Keep the SDK error when the response has no JSON body. */ }
+      throw new Error(message);
+    }
+    if (!data?.success) throw new Error('Ulasan gagal dikirim. Coba lagi sebentar.');
   }
 
   async function setReviewVisible(id, visible) {

@@ -16,6 +16,7 @@ Lalu buka alamat localhost yang ditampilkan. Detail konfigurasi Supabase dan Edg
 
 - Landing page, carousel hero, pencarian dan filter paket, halaman detail, layanan, testimoni, alamat, peta, dan tautan WhatsApp.
 - Dashboard admin untuk mengelola paket dan moderasi ulasan.
+- Rate limit server-side untuk kiriman ulasan publik: maksimal tiga ulasan per alamat IP per jam.
 - Cloudflare Turnstile pada autentikasi admin melalui Supabase Auth.
 - Edge Function untuk membuat draf deskripsi paket dengan Gemini.
 - Tema terang/gelap, layout responsif, dan dukungan instalasi PWA.
@@ -32,7 +33,7 @@ Secret Turnstile dan `GEMINI_API_KEY` disimpan di pengaturan server Supabase. Mi
 
 - Verifikasi harga, itinerary, fasilitas, ketersediaan paket, logo, serta materi foto sebelum dipublikasikan. Data katalog awal adalah estimasi/contoh dan tidak boleh dianggap sebagai penawaran resmi sebelum diverifikasi.
 - Terapkan rate limit login yang lebih ketat pada Supabase Auth dan aktifkan MFA untuk akun admin.
-- Pertimbangkan CAPTCHA atau rate limit server-side untuk formulir ulasan publik sebelum trafik tinggi. Ulasan memang menunggu moderasi, tetapi belum memiliki pembatasan per IP.
+- Pertimbangkan CAPTCHA tambahan untuk formulir ulasan jika spam masih terjadi. Rate limit server-side membatasi tiga kiriman per IP per jam; ulasan tetap menunggu moderasi.
 - Lakukan smoke test akhir pada ukuran mobile dan desktop di domain produksi, termasuk katalog, detail, login admin, unggah media, moderasi ulasan, dan tautan WhatsApp.
 
 Nomor WhatsApp yang tercantum di company profile: `0823 8957 1315`. Untuk proyek Supabase yang sudah ada, migrasi kontak tersedia di [`supabase/update-whatsapp-number.sql`](supabase/update-whatsapp-number.sql); migrasi belum diterapkan ke database.
