@@ -17,7 +17,7 @@
       <stop offset="0" stop-color="#fda292"/><stop offset="1" stop-color="#ff8f84"/>
     </linearGradient>
   </defs>
-  
+
   <!-- lengkung orbit -->
   <path class="arc" d="M750 180 C950 150 1130 230 1125 400 C1120 540 1010 690 905 765 C985 640 1040 520 1030 380 C1020 260 900 190 750 180 Z"/>
   <path class="arc" d="M285 450 C150 560 60 760 130 900 C190 1020 330 1050 485 1025 C330 1020 230 960 190 880 C140 770 190 590 285 450 Z"/>
