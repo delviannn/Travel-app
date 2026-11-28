@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220 1100" width="610" height="550" role="img" aria-label="Simbol Nusantara Journey" xmlns:c2pa="http://c2pa.org/manifest">
+  <title>Nusantara Journey</title>
+  <style>
+    :root{--txt:#2b2b2b;--arc:#93e9e2;--arco:1}
+@media (prefers-color-scheme:dark){:root{--txt:#f1f5f9;--arc:#2dd4bf;--arco:0.55}}
+    .arc{fill:var(--arc);opacity:var(--arco)}
+    </style>
+  <defs>
+    <linearGradient id="teal" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#1de9d6"/><stop offset="1" stop-color="#25d3d3"/>
+    </linearGradient>
+    <linearGradient id="mid" x1="0.1" y1="0.15" x2="0.85" y2="0.85">
+      <stop offset="0" stop-color="#4f9de0"/><stop offset="0.5" stop-color="#b47cc2"/><stop offset="1" stop-color="#f0539f"/>
+    </linearGradient>
+    <linearGradient id="sal" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#fda292"/><stop offset="1" stop-color="#ff8f84"/>
+    </linearGradient>
+  </defs>
+
+  <!-- lengkung orbit -->
+  <path class="arc" d="M750 180 C950 150 1130 230 1125 400 C1120 540 1010 690 905 765 C985 640 1040 520 1030 380 C1020 260 900 190 750 180 Z"/>
+  <path class="arc" d="M285 450 C150 560 60 760 130 900 C190 1020 330 1050 485 1025 C330 1020 230 960 190 880 C140 770 190 590 285 450 Z"/>
+  <!-- huruf N -->
+  <polygon fill="url(#teal)" points="330,500 525,500 445,685 375,848 175,848"/>
+  <polygon fill="url(#mid)" points="525,500 667,668 590,848 445,685"/>
+  <!-- huruf i -->
+  <polygon fill="url(#sal)" points="775,420 972,418 785,848 590,848"/>
+  <polygon fill="url(#sal)" points="820,308 1012,308 975,405 780,405"/>
+  
+</svg>
