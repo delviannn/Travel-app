@@ -193,8 +193,33 @@ $('#reviewForm').addEventListener('submit', async event => {
 });
 
 async function loadTestimonials() {
-  try { const reviews = await backend.loadReviews(); const box = $('#testimonialList'); if (!reviews.length) return; box.innerHTML = reviews.map(review => `<article class="testimonial-card"><div class="testimonial-stars" aria-label="${review.rating} dari 5 bintang">${'&#9733;'.repeat(review.rating)}${'&#9734;'.repeat(5-review.rating)}</div><blockquote>&ldquo;${esc(review.quote)}&rdquo;</blockquote><p>${esc(review.author)}${review.package_name ? ` &middot; ${esc(review.package_name)}` : ''}</p></article>`).join(''); } catch (error) { console.warn('Ulasan belum dapat dimuat:', error); }
+  try {
+    const reviews = await backend.loadReviews();
+    const box = $('#testimonialList');
+    if (!reviews.length) return;
+    box.innerHTML = reviews.map(review => {
+      const quote = String(review.quote ?? '');
+      const isLong = quote.length > 300;
+      const preview = isLong ? `${quote.slice(0, 300).trimEnd()}…` : quote;
+      const createdAt = review.created_at ? new Date(review.created_at) : null;
+      const dateLabel = createdAt && !Number.isNaN(createdAt.getTime())
+        ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(createdAt)
+        : '';
+      return `<article class="testimonial-card"><div class="testimonial-meta"><p class="testimonial-author">${esc(review.author)}${review.package_name ? ` <span>&middot; ${esc(review.package_name)}</span>` : ''}</p>${dateLabel ? `<time class="testimonial-date" datetime="${esc(review.created_at)}">${dateLabel}</time>` : ''}</div><blockquote>&ldquo;<span data-review-preview>${esc(preview)}</span>${isLong ? `<span data-review-full hidden>${esc(quote)}</span><button class="review-more-toggle" type="button" data-review-toggle aria-expanded="false">Baca selengkapnya</button>` : ''}&rdquo;</blockquote><div class="testimonial-stars" aria-label="${review.rating} dari 5 bintang">${'&#9733;'.repeat(review.rating)}${'&#9734;'.repeat(5-review.rating)}</div></article>`;
+    }).join('');
+  } catch (error) { console.warn('Ulasan belum dapat dimuat:', error); }
 }
+
+$('#testimonialList').addEventListener('click', event => {
+  const button = event.target.closest('[data-review-toggle]');
+  if (!button) return;
+  const quote = button.closest('blockquote');
+  const expanded = button.getAttribute('aria-expanded') !== 'true';
+  quote.querySelector('[data-review-preview]').hidden = expanded;
+  quote.querySelector('[data-review-full]').hidden = !expanded;
+  button.setAttribute('aria-expanded', String(expanded));
+  button.textContent = expanded ? 'Baca lebih sedikit' : 'Baca selengkapnya';
+});
 
 function refreshWhenReturning() {
   if (document.visibilityState === 'hidden' || Date.now() - lastCatalogRefresh < 1200) return;
