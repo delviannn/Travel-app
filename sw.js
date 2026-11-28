@@ -1,4 +1,4 @@
-const CACHE='nusantara-journey-v17';
+const CACHE='nusantara-journey-v18';
 const CORE=[
   './','./index.html','./detail.html','./admin.html','./offline.html','./styles.css','./app.js','./detail.js','./admin.js','./theme.js','./theme-init.js','./manifest.webmanifest','./icon.svg','./assets/nusantara-journey-logo.svg','./assets/nusantara-journey-mark.svg',
   './supabase-config.js','./supabase-browser.js',

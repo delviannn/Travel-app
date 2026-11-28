@@ -273,7 +273,10 @@ const sectionObserver = 'IntersectionObserver' in window ? new IntersectionObser
     });
   });
 }, { threshold: 0, rootMargin: '-22% 0px -68% 0px' }) : null;
-if (sectionObserver) ['paket', 'layanan', 'tentang'].forEach(id => sectionObserver.observe(document.getElementById(id)));
+if (sectionObserver) $$('.nav-link').forEach(link => {
+  const section = document.getElementById(link.hash.slice(1));
+  if (section) sectionObserver.observe(section);
+});
 
 const scrollProgress = $('#scrollProgress');
 const backToTop = $('#backToTop');
