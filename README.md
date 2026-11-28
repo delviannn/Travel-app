@@ -30,9 +30,9 @@ Secret Turnstile dan `GEMINI_API_KEY` disimpan di pengaturan server Supabase. Mi
 
 ## Sebelum rilis untuk pelanggan
 
-- Minta persetujuan pemilik atas harga, itinerary, fasilitas, ketersediaan paket, profil bisnis, alamat, kontak, logo, serta materi foto. Data katalog awal adalah estimasi/contoh dan tidak boleh dianggap sebagai penawaran resmi sebelum diverifikasi.
+- Verifikasi harga, itinerary, fasilitas, ketersediaan paket, logo, serta materi foto sebelum dipublikasikan. Data katalog awal adalah estimasi/contoh dan tidak boleh dianggap sebagai penawaran resmi sebelum diverifikasi.
 - Terapkan rate limit login yang lebih ketat pada Supabase Auth dan aktifkan MFA untuk akun admin.
 - Pertimbangkan CAPTCHA atau rate limit server-side untuk formulir ulasan publik sebelum trafik tinggi. Ulasan memang menunggu moderasi, tetapi belum memiliki pembatasan per IP.
 - Lakukan smoke test akhir pada ukuran mobile dan desktop di domain produksi, termasuk katalog, detail, login admin, unggah media, moderasi ulasan, dan tautan WhatsApp.
 
-Nomor WhatsApp yang digunakan saat ini: `0821 2920 7154`.
+Nomor WhatsApp yang tercantum di company profile: `0823 8957 1315`. Untuk proyek Supabase yang sudah ada, migrasi kontak tersedia di [`supabase/update-whatsapp-number.sql`](supabase/update-whatsapp-number.sql); migrasi belum diterapkan ke database.

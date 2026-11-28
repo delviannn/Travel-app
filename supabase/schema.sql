@@ -105,7 +105,7 @@ create table if not exists public.site_settings (
 );
 
 insert into public.site_settings(key, value) values
-  ('whatsapp_number', to_jsonb('6282129207154'::text)),
+  ('whatsapp_number', to_jsonb('6282389571315'::text)),
   ('office_address', to_jsonb('Ruko Mega Legenda Blok A2 No. 16, Batam Center, Kota Batam, Kepulauan Riau'::text))
 on conflict (key) do nothing;
 

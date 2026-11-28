@@ -1,4 +1,4 @@
-const WHATSAPP = '6282129207154';
+const WHATSAPP = '6282389571315';
 const backend = window.njBackend;
 const backendConfigured = Boolean(window.NJ_SUPABASE_CONFIG?.url &&
   !window.NJ_SUPABASE_CONFIG.url.includes('YOUR_PROJECT_REF') &&

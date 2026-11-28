@@ -1,6 +1,6 @@
 (() => {
 const $=s=>document.querySelector(s), esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])), money=v=>new Intl.NumberFormat('id-ID').format(v), id=new URLSearchParams(location.search).get('id'), fallback='./assets/batam-bintan.jpg', backend=window.njBackend;
-const wa=m=>'https://wa.me/6282129207154?text='+encodeURIComponent(m);
+const wa=m=>'https://wa.me/6282389571315?text='+encodeURIComponent(m);
 function render(item){const root=$('#detailContent');if(!item||item.visible===false){root.innerHTML='<div class="detail-not-found"><div class="eyebrow dark">JOURNEY COLLECTION</div><h1>Paket tidak tersedia</h1><p>Paket ini mungkin sudah tidak ditampilkan. Silakan kembali ke katalog untuk menjelajahi pilihan perjalanan lainnya.</p><a class="button navy" href="./index.html#paket">Jelajahi paket</a></div>';document.title='Paket Tidak Tersedia - Nusantara Journey';return;}
 const image=item.image||fallback, destination=item.destination||'Destinasi pilihan', duration=item.duration||'Durasi menunggu konfirmasi', videoUrl=item.videoUrl||'https://cdn.coverr.co/videos/coverr-tropical-beach-3382/1080p.mp4', videoProvider=videoUrl.includes('pexels.com')?'Video: Pexels':videoUrl.includes('pixabay.com')?'Video: Pixabay':videoUrl.includes('coverr.co')?'Video: Coverr':'Video destinasi';
 const message='Halo Nusantara Journey, saya ingin bertanya tentang paket '+item.name+' ('+destination+'). Mohon info jadwal, harga terbaru, dan fasilitasnya.';
